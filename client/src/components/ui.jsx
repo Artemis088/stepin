@@ -11,6 +11,62 @@ export function Icon({ name, size = 18, color, style, className = '' }) {
   );
 }
 
+/* Password input with a show/hide (eye) toggle. Drop-in for a password <input>;
+   forwards the usual input props and manages its own reveal state. */
+export function PasswordInput({
+  value,
+  onChange,
+  placeholder = '••••••••',
+  autoComplete = 'current-password',
+  required,
+  name,
+  id,
+  autoFocus,
+  style,
+}) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <input
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        required={required}
+        name={name}
+        id={id}
+        autoFocus={autoFocus}
+        style={{ width: '100%', paddingRight: 38 }}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        aria-label={show ? 'Hide password' : 'Show password'}
+        title={show ? 'Hide password' : 'Show password'}
+        tabIndex={-1}
+        style={{
+          position: 'absolute',
+          right: 4,
+          top: 0,
+          bottom: 0,
+          width: 32,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          color: 'var(--text-muted)',
+        }}
+      >
+        <Icon name={show ? 'eye-off' : 'eye'} size={17} />
+      </button>
+    </div>
+  );
+}
+
 export function Chip({ tone = 'neutral', icon, children, style }) {
   return (
     <span className={`chip ${tone}`} style={style}>

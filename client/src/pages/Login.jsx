@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
-import { useToast, Icon } from '../components/ui.jsx';
+import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -47,7 +47,7 @@ export default function Login() {
             <label>Password</label>
             <Link to="/forgot-password" style={{ fontSize: 12 }}>Forgot password?</Link>
           </div>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+          <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
         </div>
         <button className="primary-amber" type="submit" disabled={busy} style={{ width: '100%', height: 42, marginTop: 6 }}>
           {busy ? 'Logging in…' : 'Log in'}

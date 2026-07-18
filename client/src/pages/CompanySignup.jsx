@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
-import { useToast, Icon } from '../components/ui.jsx';
+import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
 
 const STEPS = ['Identity', 'Contact', 'Agreement', 'Done'];
 
@@ -68,7 +68,7 @@ export default function CompanySignup() {
             </div>
             <div className="field"><label>Contact name</label><input value={form.contactName} onChange={set('contactName')} placeholder="Data Lead" /></div>
             <div className="field"><label>Company-domain email</label><input type="email" value={form.contactEmail} onChange={(e) => setForm((f) => ({ ...f, contactEmail: e.target.value, email: e.target.value }))} placeholder="you@company.ge" /></div>
-            <div className="field"><label>Account password</label><input type="password" value={form.password} onChange={set('password')} placeholder="At least 6 characters" /></div>
+            <div className="field"><label>Account password</label><PasswordInput value={form.password} onChange={set('password')} placeholder="At least 6 characters" autoComplete="new-password" /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="ghost" onClick={() => setStep(0)}>Back</button>
               <button className="primary-blue" style={{ flex: 1 }} onClick={() => setStep(2)} disabled={!form.contactEmail || !form.password}>Continue</button>

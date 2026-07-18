@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
-import { Icon, useToast } from '../components/ui.jsx';
+import { Icon, useToast, PasswordInput } from '../components/ui.jsx';
 
 export default function ResetPassword() {
   const [params] = useSearchParams();
@@ -55,11 +55,11 @@ export default function ResetPassword() {
             <p className="secondary" style={{ marginBottom: 18 }}>Choose a new password for your account.</p>
             <div className="field">
               <label>New password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required autoFocus />
+              <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" autoComplete="new-password" required autoFocus />
             </div>
             <div className="field">
               <label>Confirm password</label>
-              <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" required />
+              <PasswordInput value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" autoComplete="new-password" required />
             </div>
             <button className="primary-amber" type="submit" disabled={busy} style={{ width: '100%', height: 42, marginTop: 6 }}>
               {busy ? 'Updating…' : 'Update password'}
