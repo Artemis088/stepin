@@ -9,9 +9,12 @@ const router = Router();
 
 // Browse / discover tasks (students). Supports filters.
 router.get('/', authOptional, (req, res) => {
-  const { vertical, motive, paid, skill, q } = req.query;
+  const { vertical, motive, paid, skill, q, type } = req.query;
   let rows = db.prepare(`SELECT * FROM tasks WHERE status IN ('live','screening') ORDER BY created_at DESC`).all();
 
+  // type splits the two product surfaces: 'internship' vs 'standalone'.
+  if (type === 'internship') rows = rows.filter((t) => t.is_internship === 1);
+  else if (type === 'standalone') rows = rows.filter((t) => t.is_internship === 0);
   if (vertical) rows = rows.filter((t) => t.vertical === vertical);
   if (motive) rows = rows.filter((t) => t.motive === motive);
   if (paid === 'true') rows = rows.filter((t) => t.compensation_type === 'stipend');
@@ -68,6 +71,7 @@ router.post('/', authRequired, requireRole('company'), (req, res) => {
     screeningCap = 10,
     newcomerSlots = 2,
     meritSlots = 3,
+    isInternship = false,
     applyInDays = 3,
     screeningInDays = 5,
     taskInDays = 10,
@@ -96,8 +100,8 @@ router.post('/', authRequired, requireRole('company'), (req, res) => {
     `INSERT INTO tasks
       (id, company_id, title, description, done_looks_like, vertical, skills, motive, sample_data_confirmed,
        compensation_type, stipend_amount, applied_cap, screening_cap, newcomer_slots, merit_slots, template_id,
-       status, apply_deadline, screening_deadline, task_deadline, decision_deadline, sensitivity_ok, created_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)`
+       is_internship, status, apply_deadline, screening_deadline, task_deadline, decision_deadline, sensitivity_ok, created_at)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)`
   ).run(
     tid,
     req.user.id,
@@ -115,6 +119,7 @@ router.post('/', authRequired, requireRole('company'), (req, res) => {
     Number(newcomerSlots),
     Number(meritSlots),
     template?.id || null,
+    isInternship ? 1 : 0,
     publish ? 'live' : 'draft',
     mk(applyInDays),
     mk(screeningInDays),

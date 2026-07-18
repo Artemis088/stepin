@@ -68,6 +68,7 @@ export function serializeTask(task, viewerId = null) {
     newcomerSlots: task.newcomer_slots,
     meritSlots: task.merit_slots,
     templateId: task.template_id,
+    isInternship: !!task.is_internship,
     status: task.status,
     deadlines: {
       apply: task.apply_deadline,

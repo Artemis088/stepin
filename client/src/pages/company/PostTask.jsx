@@ -46,6 +46,7 @@ export default function PostTask() {
   const skillRef = useRef(null);
 
   const [form, setForm] = useState({
+    isInternship: true,
     title: '',
     description: '',
     doneLooksLike: '',
@@ -85,6 +86,7 @@ export default function PostTask() {
     setBusy(true);
     try {
       await api.post('/tasks', {
+        isInternship: form.isInternship,
         title: form.title,
         description: form.description,
         doneLooksLike: form.doneLooksLike,
@@ -137,8 +139,34 @@ export default function PostTask() {
       </div>
 
       <div className="col" style={{ gap: 22 }}>
-        {/* Task basics */}
+        {/* Opportunity type — the single flag that defines the outcome */}
         <Section first>
+          <H3>Opportunity type</H3>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {[
+              { on: true, icon: 'school', title: 'Internship', caption: 'Entered via this trial task. The winning finalist is hired into the internship — a guaranteed outcome.' },
+              { on: false, icon: 'briefcase', title: 'Standalone task', caption: 'A one-off task. No guaranteed internship — you may reach out to strong performers later.' },
+            ].map((o) => {
+              const active = form.isInternship === o.on;
+              return (
+                <button
+                  key={String(o.on)}
+                  type="button"
+                  onClick={() => set({ isInternship: o.on })}
+                  style={{ flex: 1, textAlign: 'left', height: 'auto', display: 'block', padding: '14px 16px', borderRadius: 12, border: active ? '2px solid var(--blue)' : '0.5px solid var(--border)', background: active ? 'var(--blue-50)' : 'var(--surface-0)' }}
+                >
+                  <div style={{ fontSize: 14, fontWeight: 600, color: active ? 'var(--blue-800)' : 'var(--text-primary)' }}>
+                    <Icon name={o.icon} size={16} /> {o.title}
+                  </div>
+                  <div style={{ fontSize: 12, marginTop: 4, lineHeight: 1.5, color: active ? 'var(--blue)' : 'var(--text-secondary)' }}>{o.caption}</div>
+                </button>
+              );
+            })}
+          </div>
+        </Section>
+
+        {/* Task basics */}
+        <Section>
           <H3>Task basics</H3>
           <div className="field">
             <label>Title</label>

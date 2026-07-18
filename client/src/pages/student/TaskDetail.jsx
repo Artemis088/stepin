@@ -54,6 +54,7 @@ export default function TaskDetail() {
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+              {task.isInternship && <Chip tone="amber" icon="school">Internship</Chip>}
               <Chip tone={m.tone} icon={m.icon}>{m.label}</Chip>
               {task.sampleData && <Chip tone="teal" icon="database">Sample data</Chip>}
               <Chip tone="neutral">{task.vertical}</Chip>
@@ -65,6 +66,23 @@ export default function TaskDetail() {
               {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">Verified{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
             </div>
           </div>
+
+          {/* Outcome banner — the one thing that differs between the two types */}
+          {task.isInternship ? (
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: 'var(--amber-50)', border: '0.5px solid var(--amber)', borderRadius: 12, padding: '14px 16px' }}>
+              <Icon name="school" size={20} color="var(--amber-700)" style={{ flexShrink: 0, marginTop: 1 }} />
+              <div style={{ fontSize: 13.5, color: 'var(--amber-900)', lineHeight: 1.6 }}>
+                <b>This is an internship.</b> You enter through the trial task below. The finalist who does best is <b>hired into the internship</b> — a guaranteed outcome for the winner.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: 'var(--surface-1)', border: '0.5px solid var(--border)', borderRadius: 12, padding: '14px 16px' }}>
+              <Icon name="briefcase" size={20} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 1 }} />
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                <b style={{ color: 'var(--text-primary)' }}>One-off task.</b> It builds your verified profile — no internship is guaranteed, but a company that likes your work may reach out later.
+              </div>
+            </div>
+          )}
 
           <div><h3 style={{ fontSize: 14.5, marginBottom: 6 }}>The task</h3><p className="secondary" style={{ fontSize: 13.5, lineHeight: 1.7 }}>{task.description}</p></div>
           <div><h3 style={{ fontSize: 14.5, marginBottom: 6 }}>What "done" looks like</h3><p className="secondary" style={{ fontSize: 13.5, lineHeight: 1.7 }}>{task.doneLooksLike}</p></div>
@@ -97,6 +115,11 @@ export default function TaskDetail() {
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}><Icon name="forms" size={17} color="var(--amber-600)" /> Do a ~30 min screening step (not the full task yet)</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}><Icon name="star" size={17} color="var(--amber-600)" /> If shortlisted (best 3–5), you do the real task</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}><Icon name="microphone" size={17} color="var(--amber-600)" /> Finalists give a short walkthrough of their work</div>
+              {task.isInternship ? (
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', color: 'var(--amber-900)', fontWeight: 500 }}><Icon name="school" size={17} color="var(--amber-700)" /> The best finalist is hired into the internship</div>
+              ) : (
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}><Icon name="rosette-discount-check" size={17} color="var(--teal-700)" /> Your score builds your verified profile — no task is wasted</div>
+              )}
             </div>
           </div>
         </div>

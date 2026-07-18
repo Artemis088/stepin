@@ -104,6 +104,10 @@ CREATE TABLE IF NOT EXISTS tasks (
   newcomer_slots     INTEGER NOT NULL DEFAULT 2,
   merit_slots        INTEGER NOT NULL DEFAULT 3,
   template_id        TEXT,
+  -- The one flag that distinguishes the two product surfaces:
+  -- 1 = internship posting (winner is hired into the internship),
+  -- 0 = standalone one-off task (no guaranteed outcome). Same task engine either way.
+  is_internship      INTEGER NOT NULL DEFAULT 0,
   status             TEXT NOT NULL DEFAULT 'draft'
                        CHECK (status IN ('draft','live','screening','shortlist_ready','finalists_working','decided','closed','blocked')),
   -- the four clocks (ISO strings)
@@ -236,5 +240,13 @@ CREATE INDEX IF NOT EXISTS idx_tasks_company ON tasks(company_id);
 CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_skills_student ON skills(student_id);
 `);
+
+// --- Migrations for databases created before a column existed --------------
+// node:sqlite's CREATE TABLE IF NOT EXISTS won't add new columns to an existing
+// table, so add them here idempotently.
+const taskColumns = db.prepare('PRAGMA table_info(tasks)').all().map((c) => c.name);
+if (!taskColumns.includes('is_internship')) {
+  db.exec('ALTER TABLE tasks ADD COLUMN is_internship INTEGER NOT NULL DEFAULT 0');
+}
 
 export default db;

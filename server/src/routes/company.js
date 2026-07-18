@@ -187,8 +187,10 @@ router.post('/tasks/:id/select', authRequired, requireRole('company'), (req, res
 
   notify(winner.student_id, {
     type: 'won',
-    title: 'You were selected',
-    body: `You won "${task.title}". Sign the IP assignment to finalise.`,
+    title: task.is_internship ? "You're hired into the internship" : 'You were selected',
+    body: task.is_internship
+      ? `You won "${task.title}" and are hired into the internship. Sign the IP assignment to finalise.`
+      : `You won "${task.title}". Sign the IP assignment to finalise.`,
     icon: 'ti-trophy',
     link: `/student/agreement/${agId}`,
   });

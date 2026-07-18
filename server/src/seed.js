@@ -313,6 +313,36 @@ export function ensureSeed() {
     now()
   );
 
+  // Flag the internship postings among the seeded tasks (t1 screening, t2 finalists).
+  db.prepare('UPDATE tasks SET is_internship = 1 WHERE id IN (?, ?)').run(t1, t2);
+
+  // A few more live postings so both the Internships and Tasks tabs have content.
+  const mkLive = (company, isInternship, title, description, done, vertical, skills, motive, comp, stipend, tpl) => {
+    db.prepare(
+      `INSERT INTO tasks (id, company_id, title, description, done_looks_like, vertical, skills, motive, sample_data_confirmed,
+        compensation_type, stipend_amount, applied_cap, screening_cap, newcomer_slots, merit_slots, template_id, is_internship, status,
+        apply_deadline, screening_deadline, task_deadline, decision_deadline, sensitivity_ok, created_at)
+       VALUES (?,?,?,?,?,?,?,?,1,?,?,20,10,2,3,?,?, 'live', ?, ?, ?, ?, 1, ?)`
+    ).run(
+      id(), company, title, description, done, vertical, JSON.stringify(skills), motive,
+      comp, comp === 'stipend' ? stipend : 0, tpl, isInternship ? 1 : 0,
+      daysFromNow(4), daysFromNow(7), daysFromNow(12), daysFromNow(15), now()
+    );
+  };
+
+  // Internship postings (headline product — winner is hired).
+  mkLive(bog, 1, 'Junior Data Analyst internship',
+    'Trial task: analyse a provided sample sales dataset and summarise three insights. The strongest finalist is hired into a paid junior analyst internship. Synthetic data only.',
+    'A short insights deck built from the sample data.', 'data', ['SQL', 'Excel'], 'scouting', 'stipend', 400, dataTpl);
+  mkLive(silknet, 1, 'Frontend Engineer internship',
+    'Trial task: build a small responsive component from a provided spec. The best finalist joins the team as a frontend intern.',
+    'A working component with a short note on your approach.', 'software', ['JavaScript', 'React'], 'scouting', 'credential', 0, swTpl);
+
+  // Standalone one-off task (no guaranteed internship).
+  mkLive(tbc, 0, 'Logo concept exploration',
+    'One-off task: propose three logo directions for a fictional sample brand. Synthetic brief only — a company that likes your work may reach out later.',
+    'Three concepts with a one-line rationale each.', 'design', ['Figma'], 'needs_now', 'stipend', 120, designTpl);
+
   // A couple of notifications for Nino
   db.prepare('INSERT INTO notifications (id, user_id, type, title, body, icon, link, read, created_at) VALUES (?,?,?,?,?,?,?,0,?)').run(
     id(),

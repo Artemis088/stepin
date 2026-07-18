@@ -13,21 +13,51 @@ export default function Tasks() {
   const navigate = useNavigate();
   const { t } = useT();
   const [tasks, setTasks] = useState(null);
+  const [tab, setTab] = useState('internship'); // 'internship' (primary) | 'standalone'
   const [filters, setFilters] = useState({ vertical: '', motive: '', paid: '', q: '' });
 
   const load = () => {
-    const qs = new URLSearchParams();
+    setTasks(null);
+    const qs = new URLSearchParams({ type: tab });
     Object.entries(filters).forEach(([k, v]) => v && qs.set(k, v));
     api.get(`/tasks?${qs}`).then((d) => setTasks(d.tasks));
   };
-  useEffect(load, [filters]);
+  useEffect(load, [filters, tab]);
+
+  const TabButton = ({ value, label }) => {
+    const on = tab === value;
+    return (
+      <button
+        type="button"
+        onClick={() => setTab(value)}
+        style={{
+          height: 38,
+          padding: '0 18px',
+          border: 'none',
+          borderBottom: on ? '2px solid var(--amber)' : '2px solid transparent',
+          background: 'none',
+          fontSize: 14.5,
+          fontWeight: on ? 600 : 500,
+          color: on ? 'var(--text-primary)' : 'var(--text-muted)',
+          cursor: 'pointer',
+        }}
+      >
+        {label}
+      </button>
+    );
+  };
 
   return (
     <div className="content">
+      <div style={{ display: 'flex', gap: 4, borderBottom: '0.5px solid var(--border)', marginBottom: 16 }}>
+        <TabButton value="internship" label={t('tasks.tabInternships')} />
+        <TabButton value="standalone" label={t('tasks.tabStandalone')} />
+      </div>
       <div className="spread" style={{ marginBottom: 18 }}>
         <div>
-          <h2 style={{ fontSize: 20 }}>{t('tasks.title')}</h2>
-          <p className="secondary" style={{ marginTop: 3 }}>{t('tasks.subtitle')}</p>
+          <p className="secondary" style={{ marginTop: 0 }}>
+            {tab === 'internship' ? t('tasks.internshipsSubtitle') : t('tasks.standaloneSubtitle')}
+          </p>
         </div>
       </div>
 
@@ -55,7 +85,7 @@ export default function Tasks() {
       </div>
 
       {!tasks && <Spinner />}
-      {tasks && tasks.length === 0 && <EmptyState icon="briefcase-off" title={t('tasks.noMatch')} />}
+      {tasks && tasks.length === 0 && <EmptyState icon="briefcase-off" title={tab === 'internship' ? t('tasks.noInternships') : t('tasks.noMatch')} />}
 
       <div className="col" style={{ gap: 12 }}>
         {tasks?.map((task) => {
@@ -70,6 +100,7 @@ export default function Tasks() {
               <div className="spread" style={{ alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 9 }}>
+                    {task.isInternship && <Chip tone="amber" icon="school">{t('tasks.internshipBadge')} · {t('tasks.guaranteedHire')}</Chip>}
                     <Chip tone={m.tone} icon={m.icon}>{t(m.labelKey)}</Chip>
                     {task.sampleData && <Chip tone="teal" icon="database">{t('tasks.sampleData')}</Chip>}
                     {task.compensationType === 'stipend' ? <Chip tone="amber" icon="coin">${task.stipendAmount} {t('tasks.stipendSuffix')}</Chip> : <Chip tone="neutral" icon="rosette-discount-check">{t('tasks.credential')}</Chip>}
