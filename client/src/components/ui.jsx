@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
+import { useT } from '../i18n.jsx';
 
 /* Tabler icon (loaded via the webfont in index.html) */
 export function Icon({ name, size = 18, color, style, className = '' }) {
@@ -8,6 +9,19 @@ export function Icon({ name, size = 18, color, style, className = '' }) {
       style={{ fontSize: size, color, lineHeight: 1, ...style }}
       aria-hidden="true"
     />
+  );
+}
+
+/* StepIn logo mark — a door (you "step in" through it) on the brand teal tile. */
+export function LogoMark({ size = 30, radius = 8 }) {
+  return (
+    <span
+      className="logo-mark"
+      style={{ width: size, height: size, borderRadius: radius, fontSize: 0 }}
+      aria-label="StepIn"
+    >
+      <Icon name="door-enter" size={Math.round(size * 0.6)} color="#fff" />
+    </span>
   );
 }
 
@@ -109,15 +123,18 @@ export function Stat({ label, children, valueColor }) {
 
 /* Deadline countdown chip: amber if urgent (<=2d), bad if overdue */
 export function Countdown({ deadline, prefix, urgentDays = 2 }) {
+  const { t } = useT();
   const cd = deadline;
   if (!cd) return null;
   let tone = 'neutral';
   if (cd.overdue) tone = 'amber';
   else if (cd.days <= urgentDays) tone = 'amber';
+  // Build the label client-side so it follows the selected language.
+  const label = cd.overdue ? t('time.overdue') : cd.days === 0 ? t('time.today') : t('time.inDays', { n: cd.days });
   return (
     <Chip tone={tone} icon={cd.overdue ? 'alert-triangle' : 'clock'}>
       {prefix ? `${prefix} ` : ''}
-      {cd.overdue ? 'overdue' : cd.label}
+      {label}
     </Chip>
   );
 }

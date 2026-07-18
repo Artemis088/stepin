@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
-import { Icon, useToast, PasswordInput } from '../components/ui.jsx';
+import { Icon, useToast, PasswordInput, LogoMark } from '../components/ui.jsx';
 
 export default function ResetPassword() {
   const [params] = useSearchParams();
@@ -32,7 +32,7 @@ export default function ResetPassword() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#eaece7' }}>
       <div style={{ background: 'var(--surface-0)', border: '0.5px solid var(--border)', borderRadius: 16, padding: 30, width: '100%', maxWidth: 400 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 22 }}>
-          <div className="logo-mark">S</div>
+          <LogoMark />
           <span style={{ fontSize: 18, fontWeight: 600 }}>StepIn</span>
         </div>
 

@@ -6,3 +6,13 @@ export function isValidEmail(email) {
   if (typeof email !== 'string') return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
+
+// True only for a well-formed http(s) URL. Mirrors server util isValidUrl.
+export function isValidUrl(v) {
+  try {
+    const u = new URL(String(v).trim());
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}

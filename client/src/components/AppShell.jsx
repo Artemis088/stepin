@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Icon, Avatar } from './ui.jsx';
+import { Icon, Avatar, LogoMark } from './ui.jsx';
 import { useAuth } from '../AuthContext.jsx';
 import { api } from '../api.js';
 import { useT, LanguageToggle } from '../i18n.jsx';
 
 const NAV = {
   student: [
-    { to: '/student/tasks', icon: 'home', label: 'nav.tasks' },
+    { to: '/student/internships', icon: 'school', label: 'nav.internships' },
+    { to: '/student/tasks', icon: 'checklist', label: 'nav.tasks' },
     { to: '/student/applications', icon: 'list-check', label: 'nav.myApplications' },
     { to: '/student/profile', icon: 'user', label: 'nav.profile' },
     { to: '/student/notifications', icon: 'bell', label: 'common.notifications' },
@@ -55,7 +56,7 @@ export default function AppShell({ children }) {
     <div className="shell">
       <aside className="sidebar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 8px 20px' }}>
-          <div className="logo-mark">S</div>
+          <LogoMark />
           <span style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em' }}>StepIn</span>
         </div>
         {items.map((it) => (

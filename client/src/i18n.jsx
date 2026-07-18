@@ -32,6 +32,9 @@ const dict = {
     'field.data': 'Data',
     'field.software': 'Software',
     'field.design': 'Design',
+    'time.today': 'today',
+    'time.overdue': 'overdue',
+    'time.inDays': 'in {n}d',
 
     // landing
     'landing.tagline': 'Get your first step in.',
@@ -125,6 +128,7 @@ const dict = {
     'cs.goDashboard': 'Go to dashboard',
 
     // app shell / nav
+    'nav.internships': 'Internships',
     'nav.tasks': 'Tasks',
     'nav.myApplications': 'My applications',
     'nav.profile': 'Profile',
@@ -226,6 +230,9 @@ const dict = {
     'field.data': 'მონაცემები',
     'field.software': 'პროგრამირება',
     'field.design': 'დიზაინი',
+    'time.today': 'დღეს',
+    'time.overdue': 'ვადაგადაცილებული',
+    'time.inDays': '{n} დღეში',
 
     // landing
     'landing.tagline': 'გადადგი შენი პირველი ნაბიჯი.',
@@ -319,6 +326,7 @@ const dict = {
     'cs.goDashboard': 'დაფაზე გადასვლა',
 
     // app shell / nav
+    'nav.internships': 'სტაჟირებები',
     'nav.tasks': 'დავალებები',
     'nav.myApplications': 'ჩემი განაცხადები',
     'nav.profile': 'პროფილი',

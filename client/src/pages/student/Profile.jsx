@@ -2,12 +2,69 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
 import { Icon, Chip, Avatar, Spinner, Modal, useToast } from '../../components/ui.jsx';
+import { isValidUrl } from '../../validate.js';
 
 const EVIDENCE = {
   stepin_task: { icon: 'brand-stackshare', label: 'StepIn task' },
   certificate: { icon: 'certificate', label: 'Certificate' },
   course: { icon: 'school', label: 'Course' },
 };
+
+const MAX_MB = 10;
+const ACCEPT = '.pdf,.jpg,.jpeg,.png';
+const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+
+// Evidence inputs that change with the selected type. Kept at module scope so
+// the file/URL inputs keep focus across re-renders.
+function EvidenceFields({ evidenceType, file, setFile, url, setUrl, allowNone, onError }) {
+  const pick = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return setFile(null);
+    if (!ALLOWED_TYPES.includes(f.type)) { onError('Only PDF, JPG or PNG files are allowed.'); e.target.value = ''; return; }
+    if (f.size > MAX_MB * 1024 * 1024) { onError('File is too large (max 10 MB).'); e.target.value = ''; return; }
+    setFile(f);
+  };
+  const fileRow = file && (
+    <div className="secondary" style={{ fontSize: 12, marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+      <Icon name="paperclip" size={13} /> {file.name}
+    </div>
+  );
+
+  if (evidenceType === 'certificate') {
+    return (
+      <div className="field" style={{ marginBottom: 0 }}>
+        <label>Certificate file (PDF, JPG or PNG · max {MAX_MB} MB)</label>
+        <input type="file" accept={ACCEPT} onChange={pick} />
+        {fileRow}
+      </div>
+    );
+  }
+  if (evidenceType === 'course') {
+    return (
+      <>
+        <div className="field">
+          <label>Upload course certificate (PDF, JPG or PNG · max {MAX_MB} MB)</label>
+          <input type="file" accept={ACCEPT} onChange={pick} disabled={!!url.trim()} />
+          {fileRow}
+        </div>
+        <div className="muted" style={{ textAlign: 'center', fontSize: 12, margin: '2px 0 10px' }}>— or —</div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Public link to your course completion</label>
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://coursera.org/verify/…" disabled={!!file} />
+          {url.trim() && !file && !isValidUrl(url) && (
+            <span style={{ fontSize: 12, color: 'var(--bad)' }}>Enter a valid URL starting with http:// or https://</span>
+          )}
+        </div>
+      </>
+    );
+  }
+  // self-taught / none
+  return allowNone ? (
+    <div style={{ background: 'var(--surface-1)', border: '0.5px solid var(--border)', borderRadius: 8, padding: '11px 13px', fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+      Self-taught skills stay <b>unverified</b> until you prove them by completing a StepIn task. You can add it now and verify it later.
+    </div>
+  ) : null;
+}
 
 function evidenceMeta(skill) {
   const e = EVIDENCE[skill.evidenceType] || { icon: 'rosette-discount-check', label: 'Verified' };
@@ -24,8 +81,15 @@ export default function Profile() {
   const [busy, setBusy] = useState(false);
 
   const [form, setForm] = useState({ name: '', bio: '', about: '', vertical: 'data' });
-  const [newSkill, setNewSkill] = useState({ name: '', evidenceType: 'certificate', evidenceNote: '' });
-  const [evidence, setEvidence] = useState({ evidenceType: 'certificate', evidenceNote: '' });
+  const [newSkill, setNewSkill] = useState({ name: '', evidenceType: 'certificate' });
+  const [skillFile, setSkillFile] = useState(null);
+  const [skillUrl, setSkillUrl] = useState('');
+  const [evidence, setEvidence] = useState({ evidenceType: 'certificate' });
+  const [evFile, setEvFile] = useState(null);
+  const [evUrl, setEvUrl] = useState('');
+
+  const resetSkillForm = () => { setNewSkill({ name: '', evidenceType: 'certificate' }); setSkillFile(null); setSkillUrl(''); };
+  const resetEvidenceForm = () => { setEvidence({ evidenceType: 'certificate' }); setEvFile(null); setEvUrl(''); };
 
   const load = () => api.get(`/students/${user.id}`).then((d) => setProfile(d.profile)).catch((e) => toast.error(e.message));
   useEffect(() => { load(); }, [user.id]);
@@ -50,23 +114,52 @@ export default function Profile() {
 
   const addSkill = async () => {
     if (!newSkill.name.trim()) { toast.error('Skill name is required'); return; }
+    if (newSkill.evidenceType === 'course' && !skillFile && skillUrl.trim() && !isValidUrl(skillUrl)) {
+      toast.error('Enter a valid course link (https://…) or upload a file'); return;
+    }
     setBusy(true);
     try {
-      const { profile: p } = await api.post('/students/me/skills', newSkill);
+      let p;
+      if (skillFile) {
+        const fd = new FormData();
+        fd.append('name', newSkill.name.trim());
+        fd.append('evidenceType', newSkill.evidenceType);
+        fd.append('evidence', skillFile);
+        ({ profile: p } = await api.upload('/students/me/skills', fd));
+      } else {
+        ({ profile: p } = await api.post('/students/me/skills', {
+          name: newSkill.name.trim(),
+          evidenceType: newSkill.evidenceType,
+          evidenceUrl: newSkill.evidenceType === 'course' ? skillUrl.trim() : '',
+        }));
+      }
       setProfile(p);
       setSkillOpen(false);
-      setNewSkill({ name: '', evidenceType: 'certificate', evidenceNote: '' });
+      resetSkillForm();
       toast.success('Skill added');
     } catch (err) { toast.error(err.message); } finally { setBusy(false); }
   };
 
   const addEvidence = async () => {
+    if (evidence.evidenceType === 'certificate' && !evFile) { toast.error('Upload your certificate file to verify'); return; }
+    if (evidence.evidenceType === 'course' && !evFile && !isValidUrl(evUrl)) { toast.error('Upload a file or paste a valid course link to verify'); return; }
     setBusy(true);
     try {
-      const { profile: p } = await api.post(`/students/me/skills/${evidenceFor.id}/evidence`, evidence);
+      let p;
+      if (evFile) {
+        const fd = new FormData();
+        fd.append('evidenceType', evidence.evidenceType);
+        fd.append('evidence', evFile);
+        ({ profile: p } = await api.upload(`/students/me/skills/${evidenceFor.id}/evidence`, fd));
+      } else {
+        ({ profile: p } = await api.post(`/students/me/skills/${evidenceFor.id}/evidence`, {
+          evidenceType: evidence.evidenceType,
+          evidenceUrl: evidence.evidenceType === 'course' ? evUrl.trim() : '',
+        }));
+      }
       setProfile(p);
       setEvidenceFor(null);
-      setEvidence({ evidenceType: 'certificate', evidenceNote: '' });
+      resetEvidenceForm();
       toast.success('Evidence added — skill verified');
     } catch (err) { toast.error(err.message); } finally { setBusy(false); }
   };
@@ -147,10 +240,17 @@ export default function Profile() {
                   </div>
                   {verified ? (
                     <span className="secondary" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <Icon name={meta.icon} size={14} /> {meta.label}
+                      <Icon name={meta.icon} size={14} />
+                      {s.evidenceFile ? (
+                        <a href={`/uploads/${s.evidenceFile}`} target="_blank" rel="noreferrer">{s.evidenceNote || 'View file'}</a>
+                      ) : s.evidenceUrl ? (
+                        <a href={s.evidenceUrl} target="_blank" rel="noreferrer">View link</a>
+                      ) : (
+                        meta.label
+                      )}
                     </span>
                   ) : (
-                    <button className="sm" onClick={() => { setEvidenceFor(s); setEvidence({ evidenceType: 'certificate', evidenceNote: '' }); }}>Add evidence</button>
+                    <button className="sm" onClick={() => { setEvidenceFor(s); resetEvidenceForm(); }}>Add evidence</button>
                   )}
                 </div>
               );
@@ -231,40 +331,54 @@ export default function Profile() {
       </Modal>
 
       {/* Add skill modal */}
-      <Modal open={skillOpen} onClose={() => setSkillOpen(false)} title="Add skill"
+      <Modal open={skillOpen} onClose={() => { setSkillOpen(false); resetSkillForm(); }} title="Add skill"
         footer={<>
-          <button className="ghost" onClick={() => setSkillOpen(false)}>Cancel</button>
+          <button className="ghost" onClick={() => { setSkillOpen(false); resetSkillForm(); }}>Cancel</button>
           <button className="primary-amber" onClick={addSkill} disabled={busy}>Add skill</button>
         </>}
       >
         <p className="muted" style={{ fontSize: 12.5, marginBottom: 14, lineHeight: 1.6 }}>
-          Skills with a certificate or course become verified. StepIn-task verification is earned by completing a task, not added here.
+          The strongest verification is completing a StepIn task — that's the one we control and it can't be faked. A certificate or course link verifies a skill too, but must be backed by real proof.
         </p>
         <div className="field"><label>Skill</label><input value={newSkill.name} onChange={(e) => setNewSkill((s) => ({ ...s, name: e.target.value }))} placeholder="e.g. SQL" /></div>
         <div className="field"><label>Evidence type</label>
-          <select value={newSkill.evidenceType} onChange={(e) => setNewSkill((s) => ({ ...s, evidenceType: e.target.value }))}>
+          <select value={newSkill.evidenceType} onChange={(e) => { setNewSkill((s) => ({ ...s, evidenceType: e.target.value })); setSkillFile(null); setSkillUrl(''); }}>
             <option value="certificate">Certificate</option>
             <option value="course">Course</option>
-            <option value="none">None (stays unverified)</option>
+            <option value="none">Self-taught / other</option>
           </select>
         </div>
-        <div className="field"><label>Evidence note</label><input value={newSkill.evidenceNote} onChange={(e) => setNewSkill((s) => ({ ...s, evidenceNote: e.target.value }))} placeholder="e.g. Microsoft cert" /></div>
+        <EvidenceFields
+          evidenceType={newSkill.evidenceType}
+          file={skillFile} setFile={setSkillFile}
+          url={skillUrl} setUrl={setSkillUrl}
+          allowNone
+          onError={(m) => toast.error(m)}
+        />
       </Modal>
 
-      {/* Add evidence modal */}
-      <Modal open={!!evidenceFor} onClose={() => setEvidenceFor(null)} title={evidenceFor ? `Add evidence for ${evidenceFor.name}` : 'Add evidence'}
+      {/* Add evidence modal (verify an existing skill) */}
+      <Modal open={!!evidenceFor} onClose={() => { setEvidenceFor(null); resetEvidenceForm(); }} title={evidenceFor ? `Verify ${evidenceFor.name}` : 'Add evidence'}
         footer={<>
-          <button className="ghost" onClick={() => setEvidenceFor(null)}>Cancel</button>
+          <button className="ghost" onClick={() => { setEvidenceFor(null); resetEvidenceForm(); }}>Cancel</button>
           <button className="primary-teal" onClick={addEvidence} disabled={busy}>Verify skill</button>
         </>}
       >
+        <p className="muted" style={{ fontSize: 12.5, marginBottom: 14, lineHeight: 1.6 }}>
+          Attach real proof to verify this skill. The strongest verification is completing a StepIn task, which can't be faked.
+        </p>
         <div className="field"><label>Evidence type</label>
-          <select value={evidence.evidenceType} onChange={(e) => setEvidence((s) => ({ ...s, evidenceType: e.target.value }))}>
+          <select value={evidence.evidenceType} onChange={(e) => { setEvidence({ evidenceType: e.target.value }); setEvFile(null); setEvUrl(''); }}>
             <option value="certificate">Certificate</option>
             <option value="course">Course</option>
           </select>
         </div>
-        <div className="field"><label>Evidence note</label><input value={evidence.evidenceNote} onChange={(e) => setEvidence((s) => ({ ...s, evidenceNote: e.target.value }))} placeholder="e.g. Google Data Analytics" /></div>
+        <EvidenceFields
+          evidenceType={evidence.evidenceType}
+          file={evFile} setFile={setEvFile}
+          url={evUrl} setUrl={setEvUrl}
+          onError={(m) => toast.error(m)}
+        />
       </Modal>
     </div>
   );

@@ -118,6 +118,8 @@ export function serializeStudent(userId, { full = false } = {}) {
       status: k.status,
       evidenceType: k.evidence_type,
       evidenceNote: k.evidence_note,
+      evidenceUrl: k.evidence_url || '',
+      evidenceFile: k.evidence_file || '',
     })),
     badges: badges.map((b) => ({ id: b.id, label: b.label, icon: b.icon, count: b.count })),
     portfolio: portfolio.map((p) => ({

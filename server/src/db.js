@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS skills (
   status        TEXT NOT NULL DEFAULT 'unverified' CHECK (status IN ('verified','unverified')),
   evidence_type TEXT NOT NULL DEFAULT 'none',
   evidence_note TEXT DEFAULT '',
+  evidence_url  TEXT DEFAULT '',            -- verifiable public link (course completion, etc.)
+  evidence_file TEXT DEFAULT '',            -- uploaded proof filename (served from /uploads)
   created_at    TEXT NOT NULL
 );
 
@@ -248,5 +250,8 @@ const taskColumns = db.prepare('PRAGMA table_info(tasks)').all().map((c) => c.na
 if (!taskColumns.includes('is_internship')) {
   db.exec('ALTER TABLE tasks ADD COLUMN is_internship INTEGER NOT NULL DEFAULT 0');
 }
+const skillColumns = db.prepare('PRAGMA table_info(skills)').all().map((c) => c.name);
+if (!skillColumns.includes('evidence_url')) db.exec("ALTER TABLE skills ADD COLUMN evidence_url TEXT DEFAULT ''");
+if (!skillColumns.includes('evidence_file')) db.exec("ALTER TABLE skills ADD COLUMN evidence_file TEXT DEFAULT ''");
 
 export default db;

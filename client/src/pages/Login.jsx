@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
-import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
+import { useToast, Icon, PasswordInput, LogoMark } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
 
 export default function Login() {
@@ -19,7 +19,7 @@ export default function Login() {
     try {
       const user = await login(email.trim(), password);
       toast.success(t('login.welcomeBack'));
-      navigate(user.role === 'student' ? '/student/tasks' : user.role === 'company' ? '/company/dashboard' : '/admin');
+      navigate(user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin');
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -37,7 +37,7 @@ export default function Login() {
       <div style={{ position: 'absolute', top: 20, right: 20 }}><LanguageToggle /></div>
       <form onSubmit={submit} style={{ background: 'var(--surface-0)', border: '0.5px solid var(--border)', borderRadius: 16, padding: 30, width: '100%', maxWidth: 380 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 22 }}>
-          <div className="logo-mark">S</div>
+          <LogoMark />
           <span style={{ fontSize: 18, fontWeight: 600 }}>StepIn</span>
         </div>
         <h1 style={{ fontSize: 20, marginBottom: 18 }}>{t('login.title')}</h1>

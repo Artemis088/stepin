@@ -8,6 +8,7 @@ import './db.js';
 import { sweepDeadlines } from './logic.js';
 import { ensureSeed } from './seed.js';
 import { verifyEmail } from './email.js';
+import { UPLOAD_DIR } from './upload.js';
 
 import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/students.js';
@@ -33,6 +34,10 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/company', companyRoutes);
 app.use('/api', miscRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Serve uploaded evidence files (registered before the SPA fallback so it
+// doesn't swallow these requests).
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // In production (e.g. Render) the same server also serves the built React app,
 // so the whole site runs on one origin — no CORS or proxy needed. In local dev

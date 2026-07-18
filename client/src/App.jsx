@@ -48,7 +48,7 @@ function Protected({ role, children }) {
   if (loading) return <Spinner />;
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
   if (role && user.role !== role) {
-    const home = user.role === 'student' ? '/student/tasks' : user.role === 'company' ? '/company/dashboard' : '/admin';
+    const home = user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin';
     return <Navigate to={home} replace />;
   }
   return <AppShell>{children}</AppShell>;
@@ -69,7 +69,8 @@ export default function App() {
       <Route path="/signup/company" element={<CompanySignup />} />
 
       {/* Student */}
-      <Route path="/student/tasks" element={<Protected role="student"><Tasks /></Protected>} />
+      <Route path="/student/internships" element={<Protected role="student"><Tasks type="internship" /></Protected>} />
+      <Route path="/student/tasks" element={<Protected role="student"><Tasks type="standalone" /></Protected>} />
       <Route path="/student/tasks/:id" element={<Protected role="student"><TaskDetail /></Protected>} />
       <Route path="/student/screening/:taskId" element={<Protected role="student"><Screening /></Protected>} />
       <Route path="/student/applications" element={<Protected role="student"><Applications /></Protected>} />
@@ -104,6 +105,6 @@ export default function App() {
 }
 
 function RoleHome({ user }) {
-  const to = user.role === 'student' ? '/student/tasks' : user.role === 'company' ? '/company/dashboard' : '/admin';
+  const to = user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin';
   return <Navigate to={to} replace />;
 }

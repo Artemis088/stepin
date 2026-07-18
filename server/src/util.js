@@ -45,3 +45,13 @@ export const JWT_SECRET =
 // Mirrors the client-side check in client/src/validate.js.
 export const isValidEmail = (email) =>
   typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+// True only for a well-formed http(s) URL. Mirrors client/src/validate.js.
+export const isValidUrl = (v) => {
+  try {
+    const u = new URL(String(v).trim());
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
