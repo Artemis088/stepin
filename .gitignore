@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+
+# never commit real secrets or the local database
+.env
+server/.env
+server/stepin.db
+server/stepin.db-shm
+server/stepin.db-wal

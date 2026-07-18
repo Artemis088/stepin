@@ -1,0 +1,69 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../AuthContext.jsx';
+import { useToast, Icon } from '../components/ui.jsx';
+
+export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const user = await login(email.trim(), password);
+      toast.success(`Welcome back`);
+      navigate(user.role === 'student' ? '/student/tasks' : user.role === 'company' ? '/company/dashboard' : '/admin');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const quick = (em) => {
+    setEmail(em);
+    setPassword('password');
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#eaece7' }}>
+      <form onSubmit={submit} style={{ background: 'var(--surface-0)', border: '0.5px solid var(--border)', borderRadius: 16, padding: 30, width: '100%', maxWidth: 380 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 22 }}>
+          <div className="logo-mark">S</div>
+          <span style={{ fontSize: 18, fontWeight: 600 }}>StepIn</span>
+        </div>
+        <h1 style={{ fontSize: 20, marginBottom: 18 }}>Log in</h1>
+        <div className="field">
+          <label>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+        </div>
+        <div className="field">
+          <div className="spread">
+            <label>Password</label>
+            <Link to="/forgot-password" style={{ fontSize: 12 }}>Forgot password?</Link>
+          </div>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+        </div>
+        <button className="primary-amber" type="submit" disabled={busy} style={{ width: '100%', height: 42, marginTop: 6 }}>
+          {busy ? 'Logging in…' : 'Log in'}
+        </button>
+        <div style={{ marginTop: 16, fontSize: 13, textAlign: 'center', color: 'var(--text-secondary)' }}>
+          New here? <Link to="/get-started">Create an account</Link>
+        </div>
+        <div style={{ marginTop: 20, borderTop: '0.5px solid var(--border)', paddingTop: 14 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>Quick demo logins</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <button type="button" className="sm ghost" onClick={() => quick('nino@student.ge')}>Student</button>
+            <button type="button" className="sm ghost" onClick={() => quick('careers@tbcbank.com.ge')}>Company</button>
+            <button type="button" className="sm ghost" onClick={() => quick('admin@stepin.ge')}>Admin</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}

@@ -1,0 +1,53 @@
+# Render Blueprint for StepIn.
+# In the Render dashboard: New + -> Blueprint -> pick the repo that contains this
+# file. Render reads everything below and provisions the service automatically.
+#
+# One web service runs the Express API AND serves the built React client on a
+# single origin, so there is no CORS or proxy setup and one URL serves the whole
+# app (e.g. https://stepin.onrender.com).
+
+services:
+  - type: web
+    name: stepin
+    runtime: node
+    plan: free # free tier: spins down after ~15 min idle, ~30–50s cold start
+    # Build the client into static files, then install the server's deps.
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # node:sqlite needs a modern Node; pin it so behaviour is deterministic.
+      - key: NODE_VERSION
+        value: 24.11.1
+      # Login-token signing secret. Render generates a strong random value once.
+      - key: STEPIN_JWT_SECRET
+        generateValue: true
+      # --- Optional: real password-reset emails ---------------------------
+      # Leave these unset to run in demo mode (reset link shown on screen).
+      # To send real Gmail: set them as secrets in the Render dashboard.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
+# --- Optional: persist data across restarts/redeploys --------------------
+# The free plan has an ephemeral filesystem, so the SQLite DB resets to freshly
+# seeded demo data on each cold start (fine, even nice, for a demo). To keep
+# data permanently, upgrade the service to a paid instance and uncomment the
+# disk block below plus the STEPIN_DB_PATH env var:
+#
+#     disk:
+#       name: stepin-data
+#       mountPath: /var/data
+#       sizeGB: 1
+#
+#   and add to envVars:
+#     - key: STEPIN_DB_PATH
+#       value: /var/data/stepin.db
