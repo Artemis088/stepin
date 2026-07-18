@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Icon, LogoMark } from '../components/ui.jsx';
+import { Icon, Logo } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
 
 export default function Landing() {
@@ -9,10 +9,7 @@ export default function Landing() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#eaece7' }}>
       <div style={{ position: 'absolute', top: 20, right: 20 }}><LanguageToggle /></div>
       <div style={{ maxWidth: 640, width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-          <LogoMark size={44} radius={12} />
-          <span style={{ fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em' }}>StepIn</span>
-        </div>
+        <Logo height={44} tagline />
         <h1 style={{ fontSize: 34, lineHeight: 1.15, letterSpacing: '-0.02em' }}>{t('landing.tagline')}</h1>
         <p style={{ fontSize: 16, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 520 }}>
           {t('landing.subtitle')}

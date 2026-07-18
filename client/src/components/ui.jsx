@@ -12,15 +12,68 @@ export function Icon({ name, size = 18, color, style, className = '' }) {
   );
 }
 
-/* StepIn logo mark — a door (you "step in" through it) on the brand teal tile. */
-export function LogoMark({ size = 30, radius = 8 }) {
+/* ---------------------------- StepIn logo ------------------------------- *
+ * An open door you "step in" through: a doorframe with the leaf ajar and a
+ * handle dot. Drawn in currentColor so it works green (wordmark), white (on
+ * the brand tile) or slate (monochrome). */
+export function DoorGlyph({ size = 24, strokeWidth = 1.7 }) {
+  return (
+    <svg
+      width={size}
+      height={(size * 26) / 24}
+      viewBox="0 0 24 26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      role="img"
+      aria-hidden="true"
+    >
+      {/* open door leaf (hinged right, ajar toward the viewer) */}
+      <path d="M15 3.4 L6 5.8 V20.6 L15 23 Z" />
+      {/* fixed frame behind the leaf */}
+      <path d="M15 3.4 H19 V23 H15" />
+      {/* threshold */}
+      <path d="M3.8 23 H20.2" />
+      {/* handle */}
+      <circle cx="8.7" cy="13.2" r="1.15" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/* Icon-only mark: the door glyph (white) on the brand rounded-green tile.
+   mono => slate tile instead of green. */
+export function LogoMark({ size = 30, radius = 8, mono = false }) {
   return (
     <span
       className="logo-mark"
-      style={{ width: size, height: size, borderRadius: radius, fontSize: 0 }}
+      style={{ width: size, height: size, borderRadius: radius, fontSize: 0, background: mono ? 'var(--text-primary)' : 'var(--teal)' }}
       aria-label="StepIn"
     >
-      <Icon name="door-enter" size={Math.round(size * 0.6)} color="#fff" />
+      <DoorGlyph size={Math.round(size * 0.56)} strokeWidth={1.8} />
+    </span>
+  );
+}
+
+/* Full lockup: "Step" in slate + the door (green) standing in for "In".
+   Optional tagline underneath. mono => everything in slate. */
+export function Logo({ height = 34, tagline = false, mono = false }) {
+  const slate = 'var(--text-primary)';
+  const door = mono ? slate : 'var(--teal)';
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: Math.round(height * 0.18) }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1 }} aria-label="StepIn">
+        <span style={{ fontSize: height, fontWeight: 600, letterSpacing: '-0.02em', color: slate, lineHeight: 1 }}>Step</span>
+        <span style={{ color: door, display: 'inline-flex', marginLeft: Math.round(height * 0.04) }}>
+          <DoorGlyph size={Math.round(height * 0.94)} strokeWidth={1.7} />
+        </span>
+      </span>
+      {tagline && (
+        <span style={{ fontSize: Math.max(9, Math.round(height * 0.26)), letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+          Your first step, your future
+        </span>
+      )}
     </span>
   );
 }
