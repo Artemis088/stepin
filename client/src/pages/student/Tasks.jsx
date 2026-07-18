@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Icon, Chip, Countdown, Spinner, EmptyState } from '../../components/ui.jsx';
+import { useT } from '../../i18n.jsx';
 
 const MOTIVE = {
-  needs_now: { tone: 'amber', icon: 'bolt', label: 'Needs it now' },
-  scouting: { tone: 'blue', icon: 'users', label: 'Scouting talent' },
+  needs_now: { tone: 'amber', icon: 'bolt', labelKey: 'motive.needs_now' },
+  scouting: { tone: 'blue', icon: 'users', labelKey: 'motive.scouting' },
 };
 
 export default function Tasks() {
   const navigate = useNavigate();
+  const { t } = useT();
   const [tasks, setTasks] = useState(null);
   const [filters, setFilters] = useState({ vertical: '', motive: '', paid: '', q: '' });
 
@@ -24,8 +26,8 @@ export default function Tasks() {
     <div className="content">
       <div className="spread" style={{ marginBottom: 18 }}>
         <div>
-          <h2 style={{ fontSize: 20 }}>Tasks</h2>
-          <p className="secondary" style={{ marginTop: 3 }}>Real, small, sample-data tasks in your field.</p>
+          <h2 style={{ fontSize: 20 }}>{t('tasks.title')}</h2>
+          <p className="secondary" style={{ marginTop: 3 }}>{t('tasks.subtitle')}</p>
         </div>
       </div>
 
@@ -33,60 +35,60 @@ export default function Tasks() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
           <Icon name="search" size={15} color="var(--text-muted)" style={{ position: 'absolute', left: 11, top: 11 }} />
-          <input value={filters.q} onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))} placeholder="Search tasks" style={{ paddingLeft: 32 }} />
+          <input value={filters.q} onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))} placeholder={t('tasks.search')} style={{ paddingLeft: 32 }} />
         </div>
         <select value={filters.vertical} onChange={(e) => setFilters((f) => ({ ...f, vertical: e.target.value }))} style={{ width: 'auto' }}>
-          <option value="">All fields</option>
-          <option value="data">Data</option>
-          <option value="software">Software</option>
-          <option value="design">Design</option>
+          <option value="">{t('tasks.allFields')}</option>
+          <option value="data">{t('field.data')}</option>
+          <option value="software">{t('field.software')}</option>
+          <option value="design">{t('field.design')}</option>
         </select>
         <select value={filters.motive} onChange={(e) => setFilters((f) => ({ ...f, motive: e.target.value }))} style={{ width: 'auto' }}>
-          <option value="">Any motive</option>
-          <option value="needs_now">Needs it now</option>
-          <option value="scouting">Scouting talent</option>
+          <option value="">{t('tasks.anyMotive')}</option>
+          <option value="needs_now">{t('motive.needs_now')}</option>
+          <option value="scouting">{t('motive.scouting')}</option>
         </select>
         <select value={filters.paid} onChange={(e) => setFilters((f) => ({ ...f, paid: e.target.value }))} style={{ width: 'auto' }}>
-          <option value="">Paid or unpaid</option>
-          <option value="true">Stipend only</option>
+          <option value="">{t('tasks.paidOrUnpaid')}</option>
+          <option value="true">{t('tasks.stipendOnly')}</option>
         </select>
       </div>
 
       {!tasks && <Spinner />}
-      {tasks && tasks.length === 0 && <EmptyState icon="briefcase-off" title="No tasks match your filters" />}
+      {tasks && tasks.length === 0 && <EmptyState icon="briefcase-off" title={t('tasks.noMatch')} />}
 
       <div className="col" style={{ gap: 12 }}>
-        {tasks?.map((t) => {
-          const m = MOTIVE[t.motive];
+        {tasks?.map((task) => {
+          const m = MOTIVE[task.motive];
           return (
             <div
-              key={t.id}
+              key={task.id}
               className="card"
-              style={{ cursor: 'pointer', background: 'var(--surface-0)', ...(t.compensationType === 'stipend' || t.motive === 'needs_now' ? { borderColor: 'var(--border-strong)' } : {}) }}
-              onClick={() => navigate(`/student/tasks/${t.id}`)}
+              style={{ cursor: 'pointer', background: 'var(--surface-0)', ...(task.compensationType === 'stipend' || task.motive === 'needs_now' ? { borderColor: 'var(--border-strong)' } : {}) }}
+              onClick={() => navigate(`/student/tasks/${task.id}`)}
             >
               <div className="spread" style={{ alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 9 }}>
-                    <Chip tone={m.tone} icon={m.icon}>{m.label}</Chip>
-                    {t.sampleData && <Chip tone="teal" icon="database">Sample data</Chip>}
-                    {t.compensationType === 'stipend' ? <Chip tone="amber" icon="coin">${t.stipendAmount} stipend</Chip> : <Chip tone="neutral" icon="rosette-discount-check">Credential</Chip>}
-                    <Chip tone="neutral">{t.vertical}</Chip>
+                    <Chip tone={m.tone} icon={m.icon}>{t(m.labelKey)}</Chip>
+                    {task.sampleData && <Chip tone="teal" icon="database">{t('tasks.sampleData')}</Chip>}
+                    {task.compensationType === 'stipend' ? <Chip tone="amber" icon="coin">${task.stipendAmount} {t('tasks.stipendSuffix')}</Chip> : <Chip tone="neutral" icon="rosette-discount-check">{t('tasks.credential')}</Chip>}
+                    <Chip tone="neutral">{task.vertical}</Chip>
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 600 }}>{t.title}</div>
+                  <div style={{ fontSize: 16, fontWeight: 600 }}>{task.title}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 6 }}>
                     <Icon name="building" size={13} color="var(--blue)" />
-                    <span className="secondary" style={{ fontSize: 12.5 }}>{t.company?.name}</span>
-                    {t.company?.verified && <Chip tone="blue" icon="rosette-discount-check">Verified{t.company.rating ? ` · ${t.company.rating}` : ''}</Chip>}
+                    <span className="secondary" style={{ fontSize: 12.5 }}>{task.company?.name}</span>
+                    {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">{t('tasks.verified')}{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                    {t.skills.map((s) => <Chip key={s} tone="neutral">{s}</Chip>)}
+                    {task.skills.map((s) => <Chip key={s} tone="neutral">{s}</Chip>)}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-                  <Countdown deadline={t.countdowns.apply} prefix="Applications close" />
-                  <div className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>{t.counts.applied} / {t.appliedCap} applied</div>
-                  {t.myStage && <div style={{ marginTop: 6 }}><Chip tone="teal" icon="check">Applied</Chip></div>}
+                  <Countdown deadline={task.countdowns.apply} prefix={t('tasks.applicationsClose')} />
+                  <div className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>{t('tasks.appliedOfCap', { n: task.counts.applied, m: task.appliedCap })}</div>
+                  {task.myStage && <div style={{ marginTop: 6 }}><Chip tone="teal" icon="check">{t('tasks.applied')}</Chip></div>}
                 </div>
               </div>
             </div>

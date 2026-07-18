@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Icon, Chip, Spinner, EmptyState } from '../../components/ui.jsx';
+import { useT } from '../../i18n.jsx';
 
 const STANDING = {
   probation: {
@@ -11,7 +12,7 @@ const STANDING = {
     fg: 'var(--amber-900)',
     accent: 'var(--amber-700)',
     icon: 'shield-half',
-    label: 'Probation — limited posting rights',
+    labelKey: 'cd.probationLabel',
   },
   trusted: {
     tone: 'teal',
@@ -20,7 +21,7 @@ const STANDING = {
     fg: 'var(--teal-900)',
     accent: 'var(--teal-700)',
     icon: 'rosette-discount-check',
-    label: 'Trusted company',
+    labelKey: 'cd.trustedLabel',
   },
   flagged: {
     tone: 'bad',
@@ -29,31 +30,33 @@ const STANDING = {
     fg: 'var(--bad)',
     accent: 'var(--bad)',
     icon: 'alert-triangle',
-    label: 'Flagged — posting restricted',
+    labelKey: 'cd.flaggedLabel',
   },
 };
 
 function DeadlineChip({ status, nextDeadline }) {
+  const { t } = useT();
   if (!nextDeadline) return null;
   const critical = nextDeadline.critical;
   const prefix =
     status === 'finalists_working'
-      ? 'You decide by'
+      ? t('cd.decideBy')
       : status === 'screening'
-      ? 'Screening due'
+      ? t('cd.screeningDue')
       : status === 'live'
-      ? 'Applications close'
+      ? t('cd.applicationsClose')
       : '';
   const urgent = critical || nextDeadline.overdue || nextDeadline.days <= 2;
   return (
     <Chip tone={urgent ? 'amber' : 'neutral'} icon={nextDeadline.overdue ? 'alert-triangle' : 'clock'}>
-      {prefix} {nextDeadline.overdue ? 'overdue' : nextDeadline.label}
+      {prefix} {nextDeadline.overdue ? t('cd.overdue') : nextDeadline.label}
     </Chip>
   );
 }
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t } = useT();
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -69,7 +72,7 @@ export default function Dashboard() {
       <div className="spread" style={{ marginBottom: 20, alignItems: 'flex-start' }}>
         <div>
           <h2 style={{ fontSize: 20, color: 'var(--blue-800)' }}>{company.name}</h2>
-          <p className="secondary" style={{ marginTop: 3 }}>Your live tasks and where each one stands.</p>
+          <p className="secondary" style={{ marginTop: 3 }}>{t('cd.subtitle')}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
           <button
@@ -78,11 +81,11 @@ export default function Dashboard() {
             disabled={!company.canPost}
             onClick={() => company.canPost && navigate('/company/post')}
           >
-            <Icon name="plus" size={16} /> Post a task
+            <Icon name="plus" size={16} /> {t('cd.postTask')}
           </button>
           {!company.canPost && (
             <div className="muted" style={{ fontSize: 11.5, marginTop: 6 }}>
-              At your concurrent-task cap ({company.concurrentCap}).
+              {t('cd.atCap', { n: company.concurrentCap })}
             </div>
           )}
         </div>
@@ -104,64 +107,63 @@ export default function Dashboard() {
         <Icon name={s.icon} size={22} color={s.accent} style={{ flexShrink: 0, marginTop: 1 }} />
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 14.5, fontWeight: 600, color: s.fg }}>{s.label}</span>
+            <span style={{ fontSize: 14.5, fontWeight: 600, color: s.fg }}>{t(s.labelKey)}</span>
             <span style={{ fontSize: 12, color: s.accent }}>
-              {company.openCount} of {company.concurrentCap} tasks used
+              {t('cd.tasksUsed', { open: company.openCount, cap: company.concurrentCap })}
             </span>
           </div>
           {company.status === 'probation' && (
             <div style={{ fontSize: 12.5, color: s.fg, lineHeight: 1.6, marginTop: 6 }}>
-              You can post up to your cap while on probation. Unlock full posting rights by staying engaged:
-              give screening feedback, select winners, and meet your decision deadlines.
+              {t('cd.probationText')}
             </div>
           )}
           {company.status === 'trusted' && (
             <div style={{ fontSize: 12.5, color: s.fg, lineHeight: 1.6, marginTop: 6 }}>
-              Full posting rights. Keep meeting decision deadlines to stay trusted.
+              {t('cd.trustedText')}
             </div>
           )}
           {company.status === 'flagged' && (
             <div style={{ fontSize: 12.5, color: s.fg, lineHeight: 1.6, marginTop: 6 }}>
-              Posting is restricted while your standing is under review. Resolve open decisions to recover.
+              {t('cd.flaggedText')}
             </div>
           )}
         </div>
       </div>
 
       {/* Active tasks */}
-      <h3 style={{ fontSize: 14.5, color: 'var(--blue-800)', marginBottom: 12 }}>Active tasks</h3>
+      <h3 style={{ fontSize: 14.5, color: 'var(--blue-800)', marginBottom: 12 }}>{t('cd.activeTasks')}</h3>
       {tasks.length === 0 && (
-        <EmptyState icon="briefcase-off" title="No tasks yet">
+        <EmptyState icon="briefcase-off" title={t('cd.noTasks')}>
           <button className="primary-blue sm" style={{ marginTop: 14 }} onClick={() => navigate('/company/post')} disabled={!company.canPost}>
-            Post your first task
+            {t('cd.postFirst')}
           </button>
         </EmptyState>
       )}
 
       <div className="col" style={{ gap: 10 }}>
-        {tasks.map((t) => {
-          const funnel = `${t.counts.applied}/${t.appliedCap} applied · ${t.counts.screened}/${t.screeningCap} screened${
-            t.shortlistReady ? ' · shortlist ready' : ''
+        {tasks.map((task) => {
+          const funnel = `${task.counts.applied}/${task.appliedCap} ${t('cd.applied')} · ${task.counts.screened}/${task.screeningCap} ${t('cd.screened')}${
+            task.shortlistReady ? ` · ${t('cd.shortlistReady')}` : ''
           }`;
           return (
             <div
-              key={t.id}
+              key={task.id}
               className="card"
-              style={{ background: 'var(--surface-0)', cursor: t.shortlistReady ? 'default' : 'pointer' }}
-              onClick={() => !t.shortlistReady && navigate(`/company/tasks/${t.id}`)}
+              style={{ background: 'var(--surface-0)', cursor: task.shortlistReady ? 'default' : 'pointer' }}
+              onClick={() => !task.shortlistReady && navigate(`/company/tasks/${task.id}`)}
             >
               <div className="spread" style={{ alignItems: 'flex-start', gap: 14 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600 }}>{t.title}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{task.title}</div>
                   <div className="secondary" style={{ fontSize: 12.5, marginTop: 6 }}>{funnel}</div>
                   <div style={{ marginTop: 10 }}>
-                    <DeadlineChip status={t.status} nextDeadline={t.nextDeadline} />
+                    <DeadlineChip status={task.status} nextDeadline={task.nextDeadline} />
                   </div>
                 </div>
                 <div style={{ flexShrink: 0 }}>
-                  {t.shortlistReady ? (
-                    <button className="primary-blue sm" onClick={() => navigate(`/company/shortlist/${t.id}`)}>
-                      <Icon name="star" size={14} /> Review shortlist
+                  {task.shortlistReady ? (
+                    <button className="primary-blue sm" onClick={() => navigate(`/company/shortlist/${task.id}`)}>
+                      <Icon name="star" size={14} /> {t('cd.reviewShortlist')}
                     </button>
                   ) : (
                     <Icon name="chevron-right" size={18} color="var(--text-muted)" />

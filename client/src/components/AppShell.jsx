@@ -3,28 +3,29 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Icon, Avatar } from './ui.jsx';
 import { useAuth } from '../AuthContext.jsx';
 import { api } from '../api.js';
+import { useT, LanguageToggle } from '../i18n.jsx';
 
 const NAV = {
   student: [
-    { to: '/student/tasks', icon: 'home', label: 'Tasks' },
-    { to: '/student/applications', icon: 'list-check', label: 'My applications' },
-    { to: '/student/profile', icon: 'user', label: 'Profile' },
-    { to: '/student/notifications', icon: 'bell', label: 'Notifications' },
+    { to: '/student/tasks', icon: 'home', label: 'nav.tasks' },
+    { to: '/student/applications', icon: 'list-check', label: 'nav.myApplications' },
+    { to: '/student/profile', icon: 'user', label: 'nav.profile' },
+    { to: '/student/notifications', icon: 'bell', label: 'common.notifications' },
   ],
   company: [
-    { to: '/company/dashboard', icon: 'layout-dashboard', label: 'Dashboard' },
-    { to: '/company/post', icon: 'plus', label: 'Post a task' },
-    { to: '/company/tasks', icon: 'briefcase', label: 'My tasks' },
-    { to: '/company/profile', icon: 'building', label: 'Company profile' },
-    { to: '/company/notifications', icon: 'bell', label: 'Notifications' },
+    { to: '/company/dashboard', icon: 'layout-dashboard', label: 'nav.dashboard' },
+    { to: '/company/post', icon: 'plus', label: 'nav.postTask' },
+    { to: '/company/tasks', icon: 'briefcase', label: 'nav.myTasks' },
+    { to: '/company/profile', icon: 'building', label: 'nav.companyProfile' },
+    { to: '/company/notifications', icon: 'bell', label: 'common.notifications' },
   ],
   admin: [
-    { to: '/admin', icon: 'layout-dashboard', label: 'Overview', end: true },
-    { to: '/admin/companies', icon: 'building-bank', label: 'Company vetting' },
-    { to: '/admin/tasks', icon: 'shield-check', label: 'Sensitivity' },
-    { to: '/admin/templates', icon: 'forms', label: 'Templates' },
-    { to: '/admin/shortlist', icon: 'adjustments', label: 'Scoring & slots' },
-    { to: '/admin/incidents', icon: 'alert-triangle', label: 'Disputes & no-shows' },
+    { to: '/admin', icon: 'layout-dashboard', label: 'nav.overview', end: true },
+    { to: '/admin/companies', icon: 'building-bank', label: 'nav.companyVetting' },
+    { to: '/admin/tasks', icon: 'shield-check', label: 'nav.sensitivity' },
+    { to: '/admin/templates', icon: 'forms', label: 'nav.templates' },
+    { to: '/admin/shortlist', icon: 'adjustments', label: 'nav.scoringSlots' },
+    { to: '/admin/incidents', icon: 'alert-triangle', label: 'nav.disputes' },
   ],
 };
 
@@ -34,6 +35,7 @@ export default function AppShell({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useT();
   const [unread, setUnread] = useState(0);
 
   const role = user?.role || 'student';
@@ -47,7 +49,7 @@ export default function AppShell({ children }) {
 
   const profileName = user?.profile?.name || user?.email || '';
   const initials = user?.profile?.initials || (profileName ? profileName.slice(0, 2).toUpperCase() : '?');
-  const roleLabel = { student: 'Student', company: 'Company', admin: 'Platform admin' }[role];
+  const roleLabel = { student: t('role.student'), company: t('role.company'), admin: t('role.admin') }[role];
 
   return (
     <div className="shell">
@@ -64,7 +66,7 @@ export default function AppShell({ children }) {
             className={({ isActive }) => `nav-item ${isActive ? activeClass : ''}`}
           >
             <Icon name={it.icon} size={18} />
-            <span style={{ flex: 1 }}>{it.label}</span>
+            <span style={{ flex: 1 }}>{t(it.label)}</span>
             {it.icon === 'bell' && unread > 0 && (
               <span
                 style={{
@@ -91,9 +93,9 @@ export default function AppShell({ children }) {
             borderTop: '0.5px solid var(--border)',
           }}
         >
-          Get your first step in.
+          {t('shell.footer1')}
           <br />
-          Real tasks · verified track record.
+          {t('shell.footer2')}
         </div>
       </aside>
 
@@ -101,7 +103,8 @@ export default function AppShell({ children }) {
         <div className="topbar">
           <div />
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <NavLink to={role === 'admin' ? '/admin/incidents' : `/${role}/notifications`} title="Notifications">
+            <LanguageToggle />
+            <NavLink to={role === 'admin' ? '/admin/incidents' : `/${role}/notifications`} title={t('common.notifications')}>
               <Icon name="bell" size={19} color="var(--text-secondary)" />
             </NavLink>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
@@ -111,7 +114,7 @@ export default function AppShell({ children }) {
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{roleLabel}</div>
               </div>
             </div>
-            <button className="link" onClick={() => { logout(); navigate('/'); }} title="Log out" style={{ marginLeft: 4 }}>
+            <button className="link" onClick={() => { logout(); navigate('/'); }} title={t('common.logout')} style={{ marginLeft: 4 }}>
               <Icon name="logout" size={18} color="var(--text-muted)" />
             </button>
           </div>

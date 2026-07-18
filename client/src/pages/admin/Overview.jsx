@@ -2,18 +2,20 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Icon, Stat, Spinner, useToast } from '../../components/ui.jsx';
+import { useT } from '../../i18n.jsx';
 
 const LINKS = [
-  { to: '/admin/companies', icon: 'building-bank', label: 'Company vetting' },
-  { to: '/admin/tasks', icon: 'shield-check', label: 'Task sensitivity' },
-  { to: '/admin/templates', icon: 'forms', label: 'Screening templates' },
-  { to: '/admin/shortlist', icon: 'adjustments', label: 'Scoring & slots' },
-  { to: '/admin/incidents', icon: 'alert-triangle', label: 'Disputes & no-shows' },
+  { to: '/admin/companies', icon: 'building-bank', labelKey: 'ao.companyVetting' },
+  { to: '/admin/tasks', icon: 'shield-check', labelKey: 'ao.taskSensitivity' },
+  { to: '/admin/templates', icon: 'forms', labelKey: 'ao.screeningTemplates' },
+  { to: '/admin/shortlist', icon: 'adjustments', labelKey: 'ao.scoringSlots' },
+  { to: '/admin/incidents', icon: 'alert-triangle', labelKey: 'ao.disputes' },
 ];
 
 export default function Overview() {
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useT();
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -23,20 +25,20 @@ export default function Overview() {
   if (!stats) return <div className="content"><Spinner /></div>;
 
   const cards = [
-    { key: 'companies', label: 'Companies', icon: 'building' },
-    { key: 'students', label: 'Students', icon: 'users' },
-    { key: 'tasks', label: 'Tasks', icon: 'briefcase' },
-    { key: 'probation', label: 'On probation', icon: 'shield-half', accent: stats.probation > 0 ? 'var(--amber-700)' : undefined },
-    { key: 'openIncidents', label: 'Open incidents', icon: 'alert-triangle', accent: stats.openIncidents > 0 ? 'var(--bad)' : undefined },
-    { key: 'flagged', label: 'Flagged companies', icon: 'flag', accent: stats.flagged > 0 ? 'var(--bad)' : undefined },
+    { key: 'companies', label: t('ao.companies'), icon: 'building' },
+    { key: 'students', label: t('ao.students'), icon: 'users' },
+    { key: 'tasks', label: t('ao.tasks'), icon: 'briefcase' },
+    { key: 'probation', label: t('ao.onProbation'), icon: 'shield-half', accent: stats.probation > 0 ? 'var(--amber-700)' : undefined },
+    { key: 'openIncidents', label: t('ao.openIncidents'), icon: 'alert-triangle', accent: stats.openIncidents > 0 ? 'var(--bad)' : undefined },
+    { key: 'flagged', label: t('ao.flaggedCompanies'), icon: 'flag', accent: stats.flagged > 0 ? 'var(--bad)' : undefined },
   ];
 
   return (
     <div className="content">
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 20 }}>Overview</h2>
+        <h2 style={{ fontSize: 20 }}>{t('ao.title')}</h2>
         <p className="secondary" style={{ marginTop: 3 }}>
-          Platform operations — vetting, sensitivity, templates, scoring and disputes.
+          {t('ao.subtitle')}
         </p>
       </div>
 
@@ -52,11 +54,11 @@ export default function Overview() {
         ))}
       </div>
 
-      <h3 style={{ fontSize: 14.5, marginBottom: 12 }}>Go to</h3>
+      <h3 style={{ fontSize: 14.5, marginBottom: 12 }}>{t('ao.goTo')}</h3>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {LINKS.map((l) => (
           <button key={l.to} className="ghost" onClick={() => navigate(l.to)} style={{ height: 40, padding: '0 16px' }}>
-            <Icon name={l.icon} size={16} color="var(--teal-700)" /> {l.label}
+            <Icon name={l.icon} size={16} color="var(--teal-700)" /> {t(l.labelKey)}
           </button>
         ))}
       </div>

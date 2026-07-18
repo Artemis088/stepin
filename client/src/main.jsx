@@ -5,15 +5,18 @@ import './theme.css';
 import App from './App.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 import { ToastProvider } from './components/ui.jsx';
+import { LanguageProvider } from './i18n.jsx';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
