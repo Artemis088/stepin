@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
+import { isValidEmail } from '../validate.js';
 
 const STEPS = ['Identity', 'Contact', 'Agreement', 'Done'];
 
@@ -67,11 +68,27 @@ export default function CompanySignup() {
               <span>Use a company-domain email (generic providers like gmail are not accepted).</span>
             </div>
             <div className="field"><label>Contact name</label><input value={form.contactName} onChange={set('contactName')} placeholder="Data Lead" /></div>
-            <div className="field"><label>Company-domain email</label><input type="email" value={form.contactEmail} onChange={(e) => setForm((f) => ({ ...f, contactEmail: e.target.value, email: e.target.value }))} placeholder="you@company.ge" /></div>
+            <div className="field">
+              <label>Company-domain email</label>
+              <input type="email" value={form.contactEmail} onChange={(e) => setForm((f) => ({ ...f, contactEmail: e.target.value, email: e.target.value }))} placeholder="you@company.ge" />
+              {form.contactEmail && !isValidEmail(form.contactEmail) && (
+                <span style={{ fontSize: 12, color: 'var(--bad)' }}>Enter a valid email address, e.g. name@company.ge</span>
+              )}
+            </div>
             <div className="field"><label>Account password</label><PasswordInput value={form.password} onChange={set('password')} placeholder="At least 6 characters" autoComplete="new-password" /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="ghost" onClick={() => setStep(0)}>Back</button>
-              <button className="primary-blue" style={{ flex: 1 }} onClick={() => setStep(2)} disabled={!form.contactEmail || !form.password}>Continue</button>
+              <button
+                className="primary-blue"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  if (!isValidEmail(form.contactEmail)) return toast.error('Enter a valid email address, e.g. name@company.ge');
+                  setStep(2);
+                }}
+                disabled={!form.contactEmail || !form.password || !isValidEmail(form.contactEmail)}
+              >
+                Continue
+              </button>
             </div>
           </>
         )}

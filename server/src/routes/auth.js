@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import db from '../db.js';
-import { id, now, initials } from '../util.js';
+import { id, now, initials, isValidEmail } from '../util.js';
 import { signToken, authRequired } from '../auth.js';
 import { serializeStudent } from '../serialize.js';
 import { sendMail, isConfigured, resetEmailTemplate, APP_URL } from '../email.js';
@@ -43,6 +43,7 @@ function meFor(user) {
 router.post('/signup/student', (req, res) => {
   const { email, password, name, vertical = 'data', bio = '' } = req.body || {};
   if (!email || !password || !name) return res.status(400).json({ error: 'Name, email and password are required' });
+  if (!isValidEmail(email)) return res.status(400).json({ error: 'Enter a valid email address, e.g. name@example.com' });
   if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
   const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
   if (exists) return res.status(409).json({ error: 'An account with this email already exists' });
@@ -77,6 +78,7 @@ router.post('/signup/company', (req, res) => {
     agreementSigned,
   } = req.body || {};
   if (!email || !password || !name) return res.status(400).json({ error: 'Company name, email and password are required' });
+  if (!isValidEmail(contactEmail || email)) return res.status(400).json({ error: 'Enter a valid email address, e.g. name@company.ge' });
   if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
   // Company-domain email rule (§9): reject generic providers for the contact.

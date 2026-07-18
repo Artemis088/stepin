@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { api } from '../api.js';
 import { useToast, Icon, Chip, PasswordInput } from '../components/ui.jsx';
+import { isValidEmail } from '../validate.js';
 
 const STEPS = ['Account', 'Basic info', 'Add skills', 'Done'];
 
@@ -75,9 +76,25 @@ export default function StudentSignup() {
             <h1 style={{ fontSize: 20, marginBottom: 4 }}>Create your student account</h1>
             <p className="secondary" style={{ marginBottom: 18 }}>Real tasks, verified track record.</p>
             <div className="field"><label>Full name</label><input value={form.name} onChange={set('name')} placeholder="Nino Kapanadze" /></div>
-            <div className="field"><label>Email</label><input type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" /></div>
+            <div className="field">
+              <label>Email</label>
+              <input type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" />
+              {form.email && !isValidEmail(form.email) && (
+                <span style={{ fontSize: 12, color: 'var(--bad)' }}>Enter a valid email address, e.g. name@example.com</span>
+              )}
+            </div>
             <div className="field"><label>Password</label><PasswordInput value={form.password} onChange={set('password')} placeholder="At least 6 characters" autoComplete="new-password" /></div>
-            <button className="primary-amber" style={{ width: '100%', height: 42 }} onClick={() => setStep(1)} disabled={!form.name || !form.email || !form.password}>Continue</button>
+            <button
+              className="primary-amber"
+              style={{ width: '100%', height: 42 }}
+              onClick={() => {
+                if (!isValidEmail(form.email)) return toast.error('Enter a valid email address, e.g. name@example.com');
+                setStep(1);
+              }}
+              disabled={!form.name || !form.email || !form.password || !isValidEmail(form.email)}
+            >
+              Continue
+            </button>
             <div style={{ marginTop: 14, textAlign: 'center', fontSize: 13 }}>Already have an account? <Link to="/login">Log in</Link></div>
           </>
         )}

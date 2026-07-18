@@ -40,3 +40,8 @@ export const timeLeft = (iso) => {
 
 export const JWT_SECRET =
   process.env.STEPIN_JWT_SECRET || 'stepin-dev-secret-change-me';
+
+// Basic email-shape validation (something@something.tld, no spaces).
+// Mirrors the client-side check in client/src/validate.js.
+export const isValidEmail = (email) =>
+  typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
