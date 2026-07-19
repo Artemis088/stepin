@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { Icon, Chip, Spinner, useToast } from '../components/ui.jsx';
 
@@ -19,6 +19,7 @@ function PartyRow({ label, name, signed, role }) {
 
 export default function Agreement() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const toast = useToast();
   const [ag, setAg] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -42,6 +43,13 @@ export default function Agreement() {
 
   return (
     <div className="content" style={{ maxWidth: 640 }}>
+      <button
+        className="link"
+        onClick={() => navigate(isStudent ? '/student/applications' : '/company/tasks')}
+        style={{ marginBottom: 16, color: 'var(--text-muted)', fontSize: 12.5 }}
+      >
+        <Icon name="arrow-left" size={14} /> {isStudent ? 'Back to applications' : 'Back to my tasks'}
+      </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
         <Icon name="file-description" size={22} color="var(--text-secondary)" />
         <h2 style={{ fontSize: 20 }}>IP assignment</h2>

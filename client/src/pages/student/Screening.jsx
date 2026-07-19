@@ -60,6 +60,10 @@ export default function Screening() {
 
   return (
     <div className="content" style={{ maxWidth: 760 }}>
+      <button className="link" onClick={() => navigate(`/student/tasks/${taskId}`)} style={{ marginBottom: 16, color: 'var(--text-muted)', fontSize: 12.5 }}>
+        <Icon name="arrow-left" size={14} /> Back to task
+      </button>
+
       <div className="spread" style={{ alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>Screening step · {data.task.title}</div>

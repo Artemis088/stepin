@@ -131,6 +131,9 @@ export default function PostTask() {
 
   return (
     <div className="content" style={{ maxWidth: 760 }}>
+      <button className="link" onClick={() => navigate('/company/dashboard')} style={{ marginBottom: 16, color: 'var(--text-muted)', fontSize: 12.5 }}>
+        <Icon name="arrow-left" size={14} /> Back to dashboard
+      </button>
       <div className="spread" style={{ alignItems: 'baseline', marginBottom: 22 }}>
         <h2 style={{ fontSize: 20, color: 'var(--blue-800)' }}>Post a task</h2>
         {slots && (
