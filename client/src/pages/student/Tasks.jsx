@@ -53,10 +53,14 @@ export default function Tasks({ type = 'internship' }) {
           <option value="needs_now">{t('motive.needs_now')}</option>
           <option value="scouting">{t('motive.scouting')}</option>
         </select>
-        <select value={filters.paid} onChange={(e) => setFilters((f) => ({ ...f, paid: e.target.value }))} style={{ width: 'auto' }}>
-          <option value="">{t('tasks.paidOrUnpaid')}</option>
-          <option value="true">{t('tasks.stipendOnly')}</option>
-        </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span className="secondary" style={{ fontSize: 12.5 }}>{t('filter.pay')}</span>
+          <select value={filters.paid} onChange={(e) => setFilters((f) => ({ ...f, paid: e.target.value }))} style={{ width: 'auto' }}>
+            <option value="">{t('filter.payAll')}</option>
+            <option value="paid">{t('filter.paid')}</option>
+            <option value="unpaid">{t('filter.unpaid')}</option>
+          </select>
+        </div>
       </div>
 
       {!tasks && <Spinner />}

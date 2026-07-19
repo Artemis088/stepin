@@ -17,7 +17,9 @@ router.get('/', authOptional, (req, res) => {
   else if (type === 'standalone') rows = rows.filter((t) => t.is_internship === 0);
   if (vertical) rows = rows.filter((t) => t.vertical === vertical);
   if (motive) rows = rows.filter((t) => t.motive === motive);
-  if (paid === 'true') rows = rows.filter((t) => t.compensation_type === 'stipend');
+  // Pay filter: 'paid' = has a stipend, 'unpaid' = credential-only, else all.
+  if (paid === 'paid') rows = rows.filter((t) => t.compensation_type === 'stipend');
+  else if (paid === 'unpaid') rows = rows.filter((t) => t.compensation_type !== 'stipend');
   if (skill) rows = rows.filter((t) => parseJson(t.skills, []).some((s) => s.toLowerCase() === String(skill).toLowerCase()));
   if (q) {
     const needle = String(q).toLowerCase();
