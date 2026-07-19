@@ -4,6 +4,7 @@ import { useAuth } from '../AuthContext.jsx';
 import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
 import { isValidEmail } from '../validate.js';
 import { useT, LanguageToggle } from '../i18n.jsx';
+import { roleHome } from '../roleHome.js';
 
 const STEP_KEYS = ['cs.step.identity', 'cs.step.contact', 'cs.step.agreement', 'cs.step.done'];
 
@@ -128,7 +129,7 @@ export default function CompanySignup() {
             <p className="secondary" style={{ marginBottom: 8, lineHeight: 1.6 }}>
               {t('cs.doneText')}
             </p>
-            <button className="primary-blue" style={{ height: 42, padding: '0 24px', marginTop: 12 }} onClick={() => navigate('/company/dashboard')}>{t('cs.goDashboard')} <Icon name="arrow-right" size={16} /></button>
+            <button className="primary-blue" style={{ height: 42, padding: '0 24px', marginTop: 12 }} onClick={() => navigate(roleHome('company'))}>{t('cs.goDashboard')} <Icon name="arrow-right" size={16} /></button>
           </div>
         )}
       </div>

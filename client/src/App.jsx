@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import AppShell from './components/AppShell.jsx';
 import { Spinner } from './components/ui.jsx';
+import { roleHome } from './roleHome.js';
 
 // Entry / auth
 import Landing from './pages/Landing.jsx';
@@ -52,8 +53,7 @@ function Protected({ role, allowGuest, children }) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   if (role && user.role !== role) {
-    const home = user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin';
-    return <Navigate to={home} replace />;
+    return <Navigate to={roleHome(user.role)} replace />;
   }
   return <AppShell>{children}</AppShell>;
 }
@@ -109,6 +109,5 @@ export default function App() {
 }
 
 function RoleHome({ user }) {
-  const to = user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin';
-  return <Navigate to={to} replace />;
+  return <Navigate to={roleHome(user.role)} replace />;
 }

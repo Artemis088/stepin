@@ -98,7 +98,7 @@ const dict = {
     'ss.saving': 'Saving…',
     'ss.doneTitle': "You're all set",
     'ss.doneText': 'Your profile is live. Browse tasks in your field and do a screening to get started.',
-    'ss.browseTasks': 'Browse tasks',
+    'ss.browseTasks': 'Browse internships',
 
     // company signup
     'cs.step.identity': 'Identity',
@@ -350,7 +350,7 @@ const dict = {
     'ss.saving': 'ინახება…',
     'ss.doneTitle': 'ყველაფერი მზადაა',
     'ss.doneText': 'შენი პროფილი აქტიურია. დაათვალიერე დავალებები შენს სფეროში და დაიწყე სკრინინგით.',
-    'ss.browseTasks': 'დავალებების დათვალიერება',
+    'ss.browseTasks': 'სტაჟირებების დათვალიერება',
 
     // company signup
     'cs.step.identity': 'იდენტობა',

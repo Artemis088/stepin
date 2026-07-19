@@ -5,6 +5,7 @@ import { api } from '../api.js';
 import { useToast, Icon, Chip, PasswordInput } from '../components/ui.jsx';
 import { isValidEmail } from '../validate.js';
 import { useT, LanguageToggle } from '../i18n.jsx';
+import { roleHome } from '../roleHome.js';
 
 const STEP_KEYS = ['ss.step.account', 'ss.step.basic', 'ss.step.skills', 'ss.step.done'];
 
@@ -163,7 +164,7 @@ export default function StudentSignup() {
             <Icon name="circle-check" size={44} color="var(--teal-700)" />
             <h1 style={{ fontSize: 22, margin: '14px 0 8px' }}>{t('ss.doneTitle')}</h1>
             <p className="secondary" style={{ marginBottom: 22 }}>{t('ss.doneText')}</p>
-            <button className="primary-amber" style={{ height: 42, padding: '0 24px' }} onClick={() => navigate('/student/tasks')}>{t('ss.browseTasks')} <Icon name="arrow-right" size={16} /></button>
+            <button className="primary-amber" style={{ height: 42, padding: '0 24px' }} onClick={() => navigate(roleHome('student'))}>{t('ss.browseTasks')} <Icon name="arrow-right" size={16} /></button>
           </div>
         )}
       </div>

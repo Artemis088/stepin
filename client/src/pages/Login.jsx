@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { useToast, Icon, PasswordInput, LogoMark } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
+import { roleHome } from '../roleHome.js';
 
 export default function Login() {
   const { login } = useAuth();
@@ -19,7 +20,7 @@ export default function Login() {
     try {
       const user = await login(email.trim(), password);
       toast.success(t('login.welcomeBack'));
-      navigate(user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin');
+      navigate(roleHome(user.role));
     } catch (err) {
       toast.error(err.message);
     } finally {

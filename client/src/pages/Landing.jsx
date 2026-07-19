@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Icon, Logo } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
 import { useAuth } from '../AuthContext.jsx';
+import { roleHome } from '../roleHome.js';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Landing() {
 
         <button
           className="link"
-          onClick={() => { enterGuest(); navigate('/student/internships'); }}
+          onClick={() => { enterGuest(); navigate(roleHome('student')); }}
           style={{ fontSize: 13.5, color: 'var(--teal-700)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
         >
           <Icon name="eye" size={16} /> {t('landing.browseGuest')}
