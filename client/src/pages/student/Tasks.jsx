@@ -11,7 +11,7 @@ const MOTIVE = {
 
 export default function Tasks({ type = 'internship' }) {
   const navigate = useNavigate();
-  const { t } = useT();
+  const { t, en } = useT();
   const [tasks, setTasks] = useState(null);
   const [filters, setFilters] = useState({ vertical: '', motive: '', paid: '', q: '' });
 
@@ -75,26 +75,26 @@ export default function Tasks({ type = 'internship' }) {
               <div className="spread" style={{ alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 9 }}>
-                    {task.isInternship && <Chip tone="amber" icon="school">{t('tasks.internshipBadge')} · {t('tasks.guaranteedHire')}</Chip>}
-                    <Chip tone={m.tone} icon={m.icon}>{t(m.labelKey)}</Chip>
-                    {task.sampleData && <Chip tone="teal" icon="database">{t('tasks.sampleData')}</Chip>}
-                    {task.compensationType === 'stipend' ? <Chip tone="amber" icon="coin">${task.stipendAmount} {t('tasks.stipendSuffix')}</Chip> : <Chip tone="neutral" icon="rosette-discount-check">{t('tasks.credential')}</Chip>}
-                    <Chip tone="neutral">{t(`field.${task.vertical}`)}</Chip>
+                    {task.isInternship && <Chip tone="amber" icon="school">{en('tasks.internshipBadge')} · {en('tasks.guaranteedHire')}</Chip>}
+                    <Chip tone={m.tone} icon={m.icon}>{en(m.labelKey)}</Chip>
+                    {task.sampleData && <Chip tone="teal" icon="database">{en('tasks.sampleData')}</Chip>}
+                    {task.compensationType === 'stipend' ? <Chip tone="amber" icon="coin">${task.stipendAmount} {en('tasks.stipendSuffix')}</Chip> : <Chip tone="neutral" icon="rosette-discount-check">{en('tasks.credential')}</Chip>}
+                    <Chip tone="neutral">{en(`field.${task.vertical}`)}</Chip>
                   </div>
                   <div style={{ fontSize: 16, fontWeight: 600 }}>{task.title}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 6 }}>
                     <Icon name="building" size={13} color="var(--blue)" />
                     <span className="secondary" style={{ fontSize: 12.5 }}>{task.company?.name}</span>
-                    {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">{t('tasks.verified')}{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
+                    {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">{en('tasks.verified')}{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
                     {task.skills.map((s) => <Chip key={s} tone="neutral">{s}</Chip>)}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-                  <Countdown deadline={task.countdowns.apply} prefix={t('tasks.applicationsClose')} />
-                  <div className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>{t('tasks.appliedOfCap', { n: task.counts.applied, m: task.appliedCap })}</div>
-                  {task.myStage && <div style={{ marginTop: 6 }}><Chip tone="teal" icon="check">{t('tasks.applied')}</Chip></div>}
+                  <Countdown deadline={task.countdowns.apply} prefix={en('tasks.applicationsClose')} english />
+                  <div className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>{en('tasks.appliedOfCap', { n: task.counts.applied, m: task.appliedCap })}</div>
+                  {task.myStage && <div style={{ marginTop: 6 }}><Chip tone="teal" icon="check">{en('tasks.applied')}</Chip></div>}
                 </div>
               </div>
             </div>

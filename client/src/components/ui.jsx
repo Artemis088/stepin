@@ -175,15 +175,16 @@ export function Stat({ label, children, valueColor }) {
 }
 
 /* Deadline countdown chip: amber if urgent (<=2d), bad if overdue */
-export function Countdown({ deadline, prefix, urgentDays = 2 }) {
-  const { t } = useT();
+export function Countdown({ deadline, prefix, urgentDays = 2, english = false }) {
+  const { t, en } = useT();
   const cd = deadline;
   if (!cd) return null;
   let tone = 'neutral';
   if (cd.overdue) tone = 'amber';
   else if (cd.days <= urgentDays) tone = 'amber';
-  // Build the label client-side so it follows the selected language.
-  const label = cd.overdue ? t('time.overdue') : cd.days === 0 ? t('time.today') : t('time.inDays', { n: cd.days });
+  // Build the label client-side. `english` keeps it in English regardless of toggle.
+  const L = english ? en : t;
+  const label = cd.overdue ? L('time.overdue') : cd.days === 0 ? L('time.today') : L('time.inDays', { n: cd.days });
   return (
     <Chip tone={tone} icon={cd.overdue ? 'alert-triangle' : 'clock'}>
       {prefix ? `${prefix} ` : ''}

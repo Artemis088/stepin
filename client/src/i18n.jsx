@@ -541,13 +541,21 @@ export function LanguageProvider({ children }) {
     [lang]
   );
 
-  return <LangCtx.Provider value={{ lang, setLang, t }}>{children}</LangCtx.Provider>;
+  // Always English, ignoring the toggle — for product/status terms (the little
+  // status pills, countdowns) that read better kept in English in Georgian mode.
+  const en = useCallback((key, vars) => {
+    let str = dict.en[key] ?? key;
+    if (vars) for (const k in vars) str = str.replaceAll(`{${k}}`, vars[k]);
+    return str;
+  }, []);
+
+  return <LangCtx.Provider value={{ lang, setLang, t, en }}>{children}</LangCtx.Provider>;
 }
 
 export function useT() {
   const ctx = useContext(LangCtx);
   // Safe fallback if a component renders outside the provider.
-  if (!ctx) return { lang: 'en', setLang: () => {}, t: (k) => dict.en[k] ?? k };
+  if (!ctx) return { lang: 'en', setLang: () => {}, t: (k) => dict.en[k] ?? k, en: (k) => dict.en[k] ?? k };
   return ctx;
 }
 

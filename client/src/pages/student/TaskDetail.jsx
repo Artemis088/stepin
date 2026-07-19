@@ -17,7 +17,7 @@ export default function TaskDetail() {
   const toast = useToast();
   const { guest } = useAuth();
   const { gate } = useGuestGate();
-  const { t } = useT();
+  const { t, en } = useT();
   const [task, setTask] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -28,7 +28,8 @@ export default function TaskDetail() {
   const m = MOTIVE[task.motive];
   const applied = !!task.myStage;
 
-  const cdLabel = (cd) => (!cd ? '' : cd.overdue ? t('time.overdue') : cd.days === 0 ? t('time.today') : t('time.inDays', { n: cd.days }));
+  // Little status/deadline signs stay in English regardless of the toggle.
+  const cdLabel = (cd) => (!cd ? '' : cd.overdue ? en('time.overdue') : cd.days === 0 ? en('time.today') : en('time.inDays', { n: cd.days }));
 
   const apply = async () => {
     setBusy(true);
@@ -62,16 +63,16 @@ export default function TaskDetail() {
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-              {task.isInternship && <Chip tone="amber" icon="school">{t('tasks.internshipBadge')}</Chip>}
-              <Chip tone={m.tone} icon={m.icon}>{t(m.labelKey)}</Chip>
-              {task.sampleData && <Chip tone="teal" icon="database">{t('tasks.sampleData')}</Chip>}
-              <Chip tone="neutral">{t(`field.${task.vertical}`)}</Chip>
+              {task.isInternship && <Chip tone="amber" icon="school">{en('tasks.internshipBadge')}</Chip>}
+              <Chip tone={m.tone} icon={m.icon}>{en(m.labelKey)}</Chip>
+              {task.sampleData && <Chip tone="teal" icon="database">{en('tasks.sampleData')}</Chip>}
+              <Chip tone="neutral">{en(`field.${task.vertical}`)}</Chip>
             </div>
             <h2 style={{ fontSize: 23 }}>{task.title}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginTop: 9 }}>
               <Avatar initials={task.company?.initials} role="company" size={24} />
               <span className="secondary" style={{ fontSize: 13.5 }}>{task.company?.name}</span>
-              {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">{t('tasks.verified')}{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
+              {task.company?.verified && <Chip tone="blue" icon="rosette-discount-check">{en('tasks.verified')}{task.company.rating ? ` · ${task.company.rating}` : ''}</Chip>}
             </div>
           </div>
 
@@ -100,7 +101,7 @@ export default function TaskDetail() {
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {(task.skillMatch || task.skills.map((s) => ({ name: s }))).map((s) =>
                 s.have && s.verified ? (
-                  <Chip key={s.name} tone="teal" icon="check">{s.name} · {t('td.youHaveThis')}</Chip>
+                  <Chip key={s.name} tone="teal" icon="check">{s.name} · {en('td.youHaveThis')}</Chip>
                 ) : (
                   <Chip key={s.name} tone="neutral">{s.name}</Chip>
                 )
@@ -135,19 +136,19 @@ export default function TaskDetail() {
         {/* right status rail */}
         <div style={{ width: 262, flexShrink: 0, border: '0.5px solid var(--border)', borderRadius: 12, padding: 20, display: 'flex', flexDirection: 'column', gap: 18, background: 'var(--surface-2)' }}>
           <div>
-            <div className="spread" style={{ fontSize: 12.5, marginBottom: 6 }}><span className="secondary">{t('td.appliedLabel')}</span><span style={{ fontWeight: 600 }}>{task.counts.applied} / {task.appliedCap}</span></div>
+            <div className="spread" style={{ fontSize: 12.5, marginBottom: 6 }}><span className="secondary">{en('td.appliedLabel')}</span><span style={{ fontWeight: 600 }}>{task.counts.applied} / {task.appliedCap}</span></div>
             <Bar value={task.counts.applied} max={task.appliedCap} color="var(--amber)" />
           </div>
           <div>
-            <div className="spread" style={{ fontSize: 12.5, marginBottom: 6 }}><span className="secondary">{t('td.screeningSlots')}</span><span style={{ fontWeight: 600 }}>{task.counts.screened} / {task.screeningCap}</span></div>
+            <div className="spread" style={{ fontSize: 12.5, marginBottom: 6 }}><span className="secondary">{en('td.screeningSlots')}</span><span style={{ fontWeight: 600 }}>{task.counts.screened} / {task.screeningCap}</span></div>
             <Bar value={task.counts.screened} max={task.screeningCap} color="var(--teal-700)" />
             <div className="muted" style={{ fontSize: 11, marginTop: 6, lineHeight: 1.4 }}>{t('td.fillsNote', { n: task.newcomerSlots })}</div>
           </div>
           <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 12 }}>
-            <D n={1} label={t('tasks.applicationsClose')} cd={task.countdowns.apply} />
-            <D n={2} label={t('td.screeningDue')} cd={task.countdowns.screening} />
-            <D n={3} label={t('td.taskDueFinalists')} cd={task.countdowns.task} />
-            <D n={4} label={t('td.companyDecides')} cd={task.countdowns.decision} amber />
+            <D n={1} label={en('tasks.applicationsClose')} cd={task.countdowns.apply} />
+            <D n={2} label={en('td.screeningDue')} cd={task.countdowns.screening} />
+            <D n={3} label={en('td.taskDueFinalists')} cd={task.countdowns.task} />
+            <D n={4} label={en('td.companyDecides')} cd={task.countdowns.decision} amber />
           </div>
           {applied ? (
             <div>
