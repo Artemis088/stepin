@@ -283,7 +283,7 @@ export default function PostTask() {
           <div className="col" style={{ gap: 8 }}>
             {[
               { key: 'credential', title: 'Credential only', caption: 'student earns reputation, badge and a portfolio piece' },
-              { key: 'stipend', title: 'Add a stipend', caption: 'optional, raises visibility of your task' },
+              { key: 'stipend', title: 'Add pay', caption: 'optional, raises visibility of your task' },
             ].map((o) => {
               const on = form.compensationType === o.key;
               return (
@@ -298,7 +298,7 @@ export default function PostTask() {
             })}
             {form.compensationType === 'stipend' && (
               <div className="field" style={{ marginBottom: 0, marginTop: 4, maxWidth: 240 }}>
-                <label>Stipend amount (USD)</label>
+                <label>Pay amount (USD)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span className="secondary">$</span>
                   <input type="number" min={0} value={form.stipendAmount} onChange={(e) => set({ stipendAmount: e.target.value })} />
