@@ -68,7 +68,11 @@ CREATE TABLE IF NOT EXISTS portfolio (
   company_name TEXT,
   confidential INTEGER NOT NULL DEFAULT 0,
   role         TEXT DEFAULT '',
-  task_id      TEXT,
+  task_id      TEXT,                        -- set => StepIn-completed work (verified)
+  origin       TEXT NOT NULL DEFAULT 'stepin', -- 'stepin' (verified) | 'self' (student-added)
+  description  TEXT DEFAULT '',
+  link         TEXT DEFAULT '',             -- external project link (self-added)
+  file         TEXT DEFAULT '',             -- uploaded proof filename (served from /uploads)
   created_at   TEXT NOT NULL
 );
 
@@ -253,5 +257,10 @@ if (!taskColumns.includes('is_internship')) {
 const skillColumns = db.prepare('PRAGMA table_info(skills)').all().map((c) => c.name);
 if (!skillColumns.includes('evidence_url')) db.exec("ALTER TABLE skills ADD COLUMN evidence_url TEXT DEFAULT ''");
 if (!skillColumns.includes('evidence_file')) db.exec("ALTER TABLE skills ADD COLUMN evidence_file TEXT DEFAULT ''");
+const portfolioColumns = db.prepare('PRAGMA table_info(portfolio)').all().map((c) => c.name);
+if (!portfolioColumns.includes('origin')) db.exec("ALTER TABLE portfolio ADD COLUMN origin TEXT NOT NULL DEFAULT 'stepin'");
+if (!portfolioColumns.includes('description')) db.exec("ALTER TABLE portfolio ADD COLUMN description TEXT DEFAULT ''");
+if (!portfolioColumns.includes('link')) db.exec("ALTER TABLE portfolio ADD COLUMN link TEXT DEFAULT ''");
+if (!portfolioColumns.includes('file')) db.exec("ALTER TABLE portfolio ADD COLUMN file TEXT DEFAULT ''");
 
 export default db;

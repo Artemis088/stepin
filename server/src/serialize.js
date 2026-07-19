@@ -122,13 +122,23 @@ export function serializeStudent(userId, { full = false } = {}) {
       evidenceFile: k.evidence_file || '',
     })),
     badges: badges.map((b) => ({ id: b.id, label: b.label, icon: b.icon, count: b.count })),
-    portfolio: portfolio.map((p) => ({
-      id: p.id,
-      title: p.title,
-      companyName: p.company_name,
-      confidential: !!p.confidential,
-      role: p.role,
-    })),
+    portfolio: portfolio
+      .map((p) => ({
+        id: p.id,
+        title: p.title,
+        companyName: p.company_name,
+        confidential: !!p.confidential,
+        role: p.role,
+        description: p.description || '',
+        link: p.link || '',
+        file: p.file || '',
+        // origin 'stepin' = StepIn-completed work (verified); 'self' = student-added
+        // external work (never verified).
+        verified: p.origin !== 'self',
+        origin: p.origin === 'self' ? 'self' : 'stepin',
+      }))
+      // Verified (StepIn) items first, then self-added — each already newest-first.
+      .sort((a, b) => Number(b.verified) - Number(a.verified)),
     // structured ratings are hidden until a few exist (§8.6 early-review protection)
     ratings:
       full && ratingRows.length >= 3

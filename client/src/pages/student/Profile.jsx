@@ -91,6 +91,15 @@ export default function Profile() {
   const resetSkillForm = () => { setNewSkill({ name: '', evidenceType: 'certificate' }); setSkillFile(null); setSkillUrl(''); };
   const resetEvidenceForm = () => { setEvidence({ evidenceType: 'certificate' }); setEvFile(null); setEvUrl(''); };
 
+  // Portfolio: student-added external work
+  const [workOpen, setWorkOpen] = useState(false);
+  const [editWork, setEditWork] = useState(null);
+  const [work, setWork] = useState({ title: '', description: '', role: '', link: '' });
+  const [workFile, setWorkFile] = useState(null);
+  const resetWorkForm = () => { setEditWork(null); setWork({ title: '', description: '', role: '', link: '' }); setWorkFile(null); };
+  const openAddWork = () => { resetWorkForm(); setWorkOpen(true); };
+  const openEditWork = (p) => { setEditWork(p); setWork({ title: p.title, description: p.description || '', role: p.role || '', link: p.link || '' }); setWorkFile(null); setWorkOpen(true); };
+
   const load = () => api.get(`/students/${user.id}`).then((d) => setProfile(d.profile)).catch((e) => toast.error(e.message));
   useEffect(() => { load(); }, [user.id]);
 
@@ -161,6 +170,44 @@ export default function Profile() {
       setEvidenceFor(null);
       resetEvidenceForm();
       toast.success('Evidence added — skill verified');
+    } catch (err) { toast.error(err.message); } finally { setBusy(false); }
+  };
+
+  const saveWork = async () => {
+    if (!work.title.trim()) { toast.error('A title is required'); return; }
+    // Proof required to add; on edit the existing proof is kept if none supplied.
+    if (!editWork && !workFile && !isValidUrl(work.link)) { toast.error('Add a link or upload a file as proof of this work'); return; }
+    if (work.link.trim() && !workFile && !isValidUrl(work.link)) { toast.error('Enter a valid link or upload a file instead'); return; }
+    setBusy(true);
+    try {
+      let p;
+      const isEdit = !!editWork;
+      const path = isEdit ? `/students/me/portfolio/${editWork.id}` : '/students/me/portfolio';
+      if (workFile) {
+        const fd = new FormData();
+        fd.append('title', work.title.trim());
+        fd.append('description', work.description.trim());
+        fd.append('role', work.role.trim());
+        if (isValidUrl(work.link)) fd.append('link', work.link.trim());
+        fd.append('evidence', workFile);
+        ({ profile: p } = await api.upload(path, fd, isEdit ? 'PATCH' : 'POST'));
+      } else {
+        const body = { title: work.title.trim(), description: work.description.trim(), role: work.role.trim(), link: isValidUrl(work.link) ? work.link.trim() : '' };
+        ({ profile: p } = isEdit ? await api.patch(path, body) : await api.post(path, body));
+      }
+      setProfile(p);
+      setWorkOpen(false);
+      resetWorkForm();
+      toast.success(isEdit ? 'Work updated' : 'Work added');
+    } catch (err) { toast.error(err.message); } finally { setBusy(false); }
+  };
+
+  const removeWork = async (p) => {
+    setBusy(true);
+    try {
+      const { profile: pr } = await api.del(`/students/me/portfolio/${p.id}`);
+      setProfile(pr);
+      toast.success('Removed');
     } catch (err) { toast.error(err.message); } finally { setBusy(false); }
   };
 
@@ -270,21 +317,47 @@ export default function Profile() {
 
         {/* Portfolio */}
         <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 18 }}>
-          <h3 style={{ fontSize: 16, marginBottom: 12 }}>Portfolio</h3>
+          <div className="spread" style={{ alignItems: 'baseline', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 16 }}>Portfolio</h3>
+            <button className="sm" onClick={openAddWork}><Icon name="plus" size={13} /> Add work</button>
+          </div>
           {profile.portfolio?.length > 0 ? (
             <div className="grid-2">
               {profile.portfolio.map((p) => (
-                <div key={p.id} style={{ border: '0.5px solid var(--border)', borderRadius: 8, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>{p.title}</div>
-                  <div className="secondary" style={{ fontSize: 12, marginTop: 2, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                    {p.confidential
-                      ? <><Icon name="lock" size={13} /> Confidential client · {p.role}</>
-                      : <><Icon name="building" size={13} color="var(--blue)" /> {p.companyName} · {p.role}</>}
+                <div key={p.id} style={{ border: p.verified ? '0.5px solid var(--border)' : '0.5px dashed var(--border-strong)', borderRadius: 8, padding: '12px 14px' }}>
+                  <div className="spread" style={{ gap: 8, alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, minWidth: 0 }}>{p.title}</div>
+                    {p.verified
+                      ? <Chip tone="teal" icon="rosette-discount-check">Verified · StepIn</Chip>
+                      : <Chip tone="neutral">Self-added</Chip>}
                   </div>
+                  {p.description && <p className="secondary" style={{ fontSize: 12.5, marginTop: 6, lineHeight: 1.5 }}>{p.description}</p>}
+                  {(p.verified ? (p.companyName || p.role) : p.role) && (
+                    <div className="secondary" style={{ fontSize: 12, marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      {p.verified
+                        ? (p.confidential
+                            ? <><Icon name="lock" size={13} /> Confidential client · {p.role}</>
+                            : <><Icon name="building" size={13} color="var(--blue)" /> {p.companyName} · {p.role}</>)
+                        : <><Icon name="user" size={13} /> {p.role}</>}
+                    </div>
+                  )}
+                  {!p.verified && (p.file || p.link) && (
+                    <div style={{ marginTop: 6 }}>
+                      {p.file
+                        ? <a href={`/uploads/${p.file}`} target="_blank" rel="noreferrer" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="paperclip" size={12} /> View file</a>
+                        : <a href={p.link} target="_blank" rel="noreferrer" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="external-link" size={12} /> View project</a>}
+                    </div>
+                  )}
+                  {!p.verified && (
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                      <button className="sm ghost" onClick={() => openEditWork(p)}>Edit</button>
+                      <button className="sm ghost" onClick={() => removeWork(p)} disabled={busy}>Remove</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          ) : <p className="muted" style={{ fontSize: 12.5 }}>Completed tasks will show up here as portfolio pieces.</p>}
+          ) : <p className="muted" style={{ fontSize: 12.5 }}>Completed StepIn tasks appear here automatically. You can also add your own outside projects.</p>}
         </div>
 
         {/* Ratings & history */}
@@ -379,6 +452,52 @@ export default function Profile() {
           url={evUrl} setUrl={setEvUrl}
           onError={(m) => toast.error(m)}
         />
+      </Modal>
+
+      {/* Add / edit external work modal */}
+      <Modal open={workOpen} onClose={() => { setWorkOpen(false); resetWorkForm(); }} title={editWork ? 'Edit work' : 'Add work'}
+        footer={<>
+          <button className="ghost" onClick={() => { setWorkOpen(false); resetWorkForm(); }}>Cancel</button>
+          <button className="primary-amber" onClick={saveWork} disabled={busy}>{editWork ? 'Save' : 'Add work'}</button>
+        </>}
+      >
+        <p className="muted" style={{ fontSize: 12.5, marginBottom: 14, lineHeight: 1.6 }}>
+          Outside projects are tagged <b>Self-added</b> — StepIn can't verify work it didn't run, so these never get the verified badge. A link or file is still required as proof.
+        </p>
+        <div className="field"><label>Title</label><input value={work.title} onChange={(e) => setWork((w) => ({ ...w, title: e.target.value }))} placeholder="e.g. Personal budgeting app" /></div>
+        <div className="field"><label>Short description</label><textarea rows={2} value={work.description} onChange={(e) => setWork((w) => ({ ...w, description: e.target.value }))} style={{ resize: 'none' }} placeholder="What it is, in a sentence or two" /></div>
+        <div className="field"><label>Your role</label><input value={work.role} onChange={(e) => setWork((w) => ({ ...w, role: e.target.value }))} placeholder="e.g. Solo developer" /></div>
+        <div className="field">
+          <label>Link to the project</label>
+          <input value={work.link} onChange={(e) => setWork((w) => ({ ...w, link: e.target.value }))} placeholder="https://github.com/…" disabled={!!workFile} />
+          {work.link.trim() && !workFile && !isValidUrl(work.link) && (
+            <span style={{ fontSize: 12, color: 'var(--bad)' }}>Enter a valid URL starting with http:// or https://</span>
+          )}
+        </div>
+        <div className="muted" style={{ textAlign: 'center', fontSize: 12, margin: '2px 0 10px' }}>— or —</div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Upload a file (PDF, JPG or PNG · max {MAX_MB} MB)</label>
+          <input
+            type="file"
+            accept={ACCEPT}
+            disabled={!!work.link.trim()}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return setWorkFile(null);
+              if (!ALLOWED_TYPES.includes(f.type)) { toast.error('Only PDF, JPG or PNG files are allowed.'); e.target.value = ''; return; }
+              if (f.size > MAX_MB * 1024 * 1024) { toast.error('File is too large (max 10 MB).'); e.target.value = ''; return; }
+              setWorkFile(f);
+            }}
+          />
+          {workFile && (
+            <div className="secondary" style={{ fontSize: 12, marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <Icon name="paperclip" size={13} /> {workFile.name}
+            </div>
+          )}
+          {editWork && !workFile && (editWork.file || editWork.link) && (
+            <div className="muted" style={{ fontSize: 11.5, marginTop: 6 }}>Current proof is kept unless you add a new link or file.</div>
+          )}
+        </div>
       </Modal>
     </div>
   );

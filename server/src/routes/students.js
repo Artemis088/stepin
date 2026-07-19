@@ -100,4 +100,49 @@ router.delete('/me/skills/:skillId', authRequired, requireRole('student'), (req,
   res.json({ profile: serializeStudent(req.user.id, { full: true }) });
 });
 
+// --- Portfolio: add student's own external work --------------------------
+// Always 'self' origin (never verified). A link or uploaded file is required
+// as proof — no proof, no add.
+router.post('/me/portfolio', authRequired, requireRole('student'), evidenceUpload, (req, res) => {
+  const { title, description = '', role = '', link = '' } = req.body || {};
+  if (!title?.trim()) return res.status(400).json({ error: 'A title is required' });
+  const file = req.file?.filename || '';
+  const cleanLink = isValidUrl(link) ? String(link).trim() : '';
+  if (!file && !cleanLink) return res.status(400).json({ error: 'Add a link or upload a file as proof of this work.' });
+  db.prepare(
+    `INSERT INTO portfolio (id, student_id, title, company_name, confidential, role, task_id, origin, description, link, file, created_at)
+     VALUES (?,?,?,NULL,0,?,NULL,'self',?,?,?,?)`
+  ).run(id(), req.user.id, title.trim(), role.trim(), description.trim(), cleanLink, file, now());
+  res.json({ profile: serializeStudent(req.user.id, { full: true }) });
+});
+
+// --- Portfolio: edit own self-added work (StepIn work is locked) ----------
+router.patch('/me/portfolio/:pid', authRequired, requireRole('student'), evidenceUpload, (req, res) => {
+  const item = db.prepare('SELECT * FROM portfolio WHERE id = ? AND student_id = ?').get(req.params.pid, req.user.id);
+  if (!item) return res.status(404).json({ error: 'Portfolio item not found' });
+  if (item.origin !== 'self') return res.status(403).json({ error: 'StepIn-completed work cannot be edited.' });
+  const { title, description = '', role = '', link = '' } = req.body || {};
+  if (!title?.trim()) return res.status(400).json({ error: 'A title is required' });
+  const newFile = req.file?.filename || '';
+  const cleanLink = isValidUrl(link) ? String(link).trim() : '';
+  // A new file or link replaces the proof; otherwise keep what's there.
+  let file = item.file, finalLink = item.link;
+  if (newFile) { file = newFile; finalLink = ''; }
+  else if (cleanLink) { finalLink = cleanLink; file = ''; }
+  if (!file && !finalLink) return res.status(400).json({ error: 'Keep a link or file as proof of this work.' });
+  db.prepare('UPDATE portfolio SET title = ?, description = ?, role = ?, link = ?, file = ? WHERE id = ?').run(
+    title.trim(), description.trim(), role.trim(), finalLink, file, item.id
+  );
+  res.json({ profile: serializeStudent(req.user.id, { full: true }) });
+});
+
+// --- Portfolio: remove own self-added work -------------------------------
+router.delete('/me/portfolio/:pid', authRequired, requireRole('student'), (req, res) => {
+  const item = db.prepare('SELECT * FROM portfolio WHERE id = ? AND student_id = ?').get(req.params.pid, req.user.id);
+  if (!item) return res.status(404).json({ error: 'Portfolio item not found' });
+  if (item.origin !== 'self') return res.status(403).json({ error: 'StepIn-completed work cannot be removed.' });
+  db.prepare('DELETE FROM portfolio WHERE id = ?').run(item.id);
+  res.json({ profile: serializeStudent(req.user.id, { full: true }) });
+});
+
 export default router;

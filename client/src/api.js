@@ -38,11 +38,11 @@ async function request(method, path, body) {
 
 // Multipart upload (FormData). Lets the browser set the multipart boundary —
 // do NOT set Content-Type manually.
-async function upload(path, formData) {
+async function upload(path, formData, method = 'POST') {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(`/api${path}`, { method: 'POST', headers, body: formData });
+  const res = await fetch(`/api${path}`, { method, headers, body: formData });
   const text = await res.text();
   let data = null;
   if (text) {
