@@ -13,17 +13,25 @@ export default function Tasks({ type = 'internship' }) {
   const navigate = useNavigate();
   const { t, en } = useT();
   const [tasks, setTasks] = useState(null);
-  const [filters, setFilters] = useState({ vertical: '', motive: '', paid: '', q: '' });
+  const [filters, setFilters] = useState({ vertical: '', motive: '', q: '', payPaid: false, payUnpaid: false });
+  const [payOpen, setPayOpen] = useState(false);
 
   const load = () => {
     setTasks(null);
     const qs = new URLSearchParams({ type });
-    Object.entries(filters).forEach(([k, v]) => v && qs.set(k, v));
+    if (filters.vertical) qs.set('vertical', filters.vertical);
+    if (filters.motive) qs.set('motive', filters.motive);
+    if (filters.q) qs.set('q', filters.q);
+    // Pay checkboxes: filter only when exactly one is ticked (both or none = all).
+    if (filters.payPaid && !filters.payUnpaid) qs.set('paid', 'paid');
+    else if (filters.payUnpaid && !filters.payPaid) qs.set('paid', 'unpaid');
     api.get(`/tasks?${qs}`).then((d) => setTasks(d.tasks));
   };
   useEffect(load, [filters, type]);
 
   const isInternshipView = type === 'internship';
+  const paySelected = [filters.payPaid && t('filter.paid'), filters.payUnpaid && t('filter.unpaid')].filter(Boolean);
+  const payLabel = paySelected.length ? paySelected.join(', ') : t('filter.pay');
 
   return (
     <div className="content">
@@ -53,13 +61,42 @@ export default function Tasks({ type = 'internship' }) {
           <option value="needs_now">{t('motive.needs_now')}</option>
           <option value="scouting">{t('motive.scouting')}</option>
         </select>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span className="secondary" style={{ fontSize: 12.5 }}>{t('filter.pay')}</span>
-          <select value={filters.paid} onChange={(e) => setFilters((f) => ({ ...f, paid: e.target.value }))} style={{ width: 'auto' }}>
-            <option value="">{t('filter.payAll')}</option>
-            <option value="paid">{t('filter.paid')}</option>
-            <option value="unpaid">{t('filter.unpaid')}</option>
-          </select>
+        <div style={{ position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => setPayOpen((o) => !o)}
+            aria-haspopup="true"
+            aria-expanded={payOpen}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 11px',
+              border: '0.5px solid var(--border-strong)', borderRadius: 'var(--radius)', background: 'var(--surface-0)',
+              fontSize: 13, color: paySelected.length ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer',
+            }}
+          >
+            {payLabel}
+            <Icon name="chevron-down" size={14} color="var(--text-muted)" />
+          </button>
+          {payOpen && (
+            <>
+              <div style={{ position: 'fixed', inset: 0, zIndex: 20 }} onClick={() => setPayOpen(false)} />
+              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, zIndex: 21, background: 'var(--surface-0)', border: '0.5px solid var(--border-strong)', borderRadius: 8, padding: 6, minWidth: 160, boxShadow: '0 6px 18px rgba(0,0,0,0.10)' }}>
+                {[
+                  { key: 'payPaid', label: t('filter.paid') },
+                  { key: 'payUnpaid', label: t('filter.unpaid') },
+                ].map((o) => (
+                  <label key={o.key} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 9px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>
+                    <input
+                      type="checkbox"
+                      checked={filters[o.key]}
+                      onChange={(e) => setFilters((f) => ({ ...f, [o.key]: e.target.checked }))}
+                      style={{ width: 15, height: 15 }}
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
