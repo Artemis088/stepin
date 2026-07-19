@@ -12,55 +12,11 @@ export function Icon({ name, size = 18, color, style, className = '' }) {
   );
 }
 
-/* ---------------------------- StepIn logo ------------------------------- *
- * "In" drawn as a dark bar (the I) + an open door: darker-green frame,
- * lighter-green leaf, dark handle dot, pale floor spill. Exact brand colors. */
-const LOGO = { dark: '#2B2B2B', greenDark: '#5F7566', greenLight: '#7C9482', floor: '#D5E0D5' };
-
-export function DoorGlyph({ size = 32 }) {
-  return (
-    <svg width={size} height={(size * 64) / 60} viewBox="0 0 60 64" fill="none" role="img" aria-label="StepIn">
-      {/* pale floor spilling from the open door */}
-      <path d="M27 50 L46 48 L56 62 L16 62 Z" fill={LOGO.floor} />
-      {/* doorframe (darker green) */}
-      <rect x="37" y="10" width="13" height="42" rx="3" fill={LOGO.greenDark} />
-      {/* open door leaf (lighter green), hinged right, ajar toward viewer */}
-      <path d="M44 10 L27 15 V54 L44 52 Z" fill={LOGO.greenLight} />
-      {/* the "I" bar */}
-      <rect x="9" y="13" width="9" height="39" rx="4.5" fill={LOGO.dark} />
-      {/* door handle */}
-      <circle cx="32.5" cy="33" r="2.6" fill={LOGO.dark} />
-    </svg>
-  );
-}
-
-/* Icon-only mark: the glyph on a light rounded square (app-icon style). */
-export function LogoMark({ size = 32, radius = 9 }) {
-  return (
-    <span
-      style={{ width: size, height: size, borderRadius: radius, background: '#fff', border: '1px solid #e6e8e3', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-      aria-label="StepIn"
-    >
-      <DoorGlyph size={Math.round(size * 0.66)} />
-    </span>
-  );
-}
-
-/* Full lockup: "Step" (dark) + the door standing in for "In", optional tagline. */
-export function Logo({ height = 40, tagline = false }) {
-  return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: Math.round(height * 0.22) }}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: Math.round(height * 0.02) }} aria-label="StepIn">
-        <span style={{ fontSize: height, fontWeight: 600, letterSpacing: '-0.03em', color: LOGO.dark, lineHeight: 1 }}>Step</span>
-        <DoorGlyph size={Math.round(height * 1.16)} />
-      </span>
-      {tagline && (
-        <span style={{ fontSize: Math.max(9, Math.round(height * 0.24)), letterSpacing: '0.28em', textTransform: 'uppercase', color: LOGO.greenLight, whiteSpace: 'nowrap' }}>
-          Your first step, your future
-        </span>
-      )}
-    </span>
-  );
+/* Icon-only mark — the brand app-icon image (door on a light rounded tile).
+   Used in the sidebars and the login/reset headers. The full lockup image
+   lives on the landing page directly (public/logo-lockup.png). */
+export function LogoMark({ size = 32 }) {
+  return <img src="/logo-icon.png" width={size} height={size} alt="StepIn" style={{ display: 'block', flexShrink: 0 }} />;
 }
 
 /* Password input with a show/hide (eye) toggle. Drop-in for a password <input>;
