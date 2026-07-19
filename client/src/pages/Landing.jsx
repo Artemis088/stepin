@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Icon, Logo } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
+import { useAuth } from '../AuthContext.jsx';
 
 export default function Landing() {
   const navigate = useNavigate();
   const { t } = useT();
+  const { enterGuest } = useAuth();
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#eaece7' }}>
       <div style={{ position: 'absolute', top: 20, right: 20 }}><LanguageToggle /></div>
@@ -23,6 +25,14 @@ export default function Landing() {
             <Icon name="building" size={18} /> {t('landing.imCompany')}
           </button>
         </div>
+
+        <button
+          className="link"
+          onClick={() => { enterGuest(); navigate('/student/internships'); }}
+          style={{ fontSize: 13.5, color: 'var(--teal-700)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+        >
+          <Icon name="eye" size={16} /> {t('landing.browseGuest')}
+        </button>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
           {[

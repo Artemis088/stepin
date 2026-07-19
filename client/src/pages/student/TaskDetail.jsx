@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Icon, Chip, Bar, Countdown, Spinner, Avatar, useToast } from '../../components/ui.jsx';
+import { useAuth } from '../../AuthContext.jsx';
+import { useGuestGate } from '../../GuestGate.jsx';
 
 const MOTIVE = {
   needs_now: { tone: 'amber', icon: 'bolt', label: 'Needs it now' },
@@ -12,6 +14,8 @@ export default function TaskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const { guest } = useAuth();
+  const { gate } = useGuestGate();
   const [task, setTask] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -150,10 +154,17 @@ export default function TaskDetail() {
             </div>
           ) : (
             <div>
-              <button className="primary-amber" style={{ width: '100%', height: 44 }} onClick={apply} disabled={busy || task.countdowns.apply?.overdue}>
-                Express interest
+              <button
+                className="primary-amber"
+                style={{ width: '100%', height: 44 }}
+                onClick={guest ? () => gate() : apply}
+                disabled={guest ? false : busy || task.countdowns.apply?.overdue}
+              >
+                {guest ? 'Sign up to apply' : 'Express interest'}
               </button>
-              <div className="muted" style={{ fontSize: 11, marginTop: 8, textAlign: 'center' }}>grabs 1 of the {task.appliedCap} applied slots</div>
+              <div className="muted" style={{ fontSize: 11, marginTop: 8, textAlign: 'center' }}>
+                {guest ? 'Create a free account to apply and start the trial task' : `grabs 1 of the ${task.appliedCap} applied slots`}
+              </div>
             </div>
           )}
         </div>

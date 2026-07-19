@@ -6,6 +6,7 @@ import App from './App.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 import { ToastProvider } from './components/ui.jsx';
 import { LanguageProvider } from './i18n.jsx';
+import { GuestGateProvider } from './GuestGate.jsx';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')).render(
       <LanguageProvider>
         <AuthProvider>
           <ToastProvider>
-            <App />
+            <GuestGateProvider>
+              <App />
+            </GuestGateProvider>
           </ToastProvider>
         </AuthProvider>
       </LanguageProvider>

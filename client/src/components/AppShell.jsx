@@ -32,7 +32,7 @@ const NAV = {
 
 const ACTIVE_CLASS = { student: 'active-amber', company: 'active-blue', admin: 'active-teal' };
 
-export default function AppShell({ children }) {
+export default function AppShell({ children, guest = false }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,13 +40,14 @@ export default function AppShell({ children }) {
   const [unread, setUnread] = useState(0);
 
   const role = user?.role || 'student';
-  const items = NAV[role];
+  // Guests get a read-only student browse: just Internships + Tasks.
+  const items = guest ? NAV.student.slice(0, 2) : NAV[role];
   const activeClass = ACTIVE_CLASS[role];
 
   useEffect(() => {
-    if (role === 'admin') return;
+    if (guest || role === 'admin') return;
     api.get('/notifications').then((d) => setUnread(d.unread)).catch(() => {});
-  }, [role, location.pathname]);
+  }, [guest, role, location.pathname]);
 
   const profileName = user?.profile?.name || user?.email || '';
   const initials = user?.profile?.initials || (profileName ? profileName.slice(0, 2).toUpperCase() : '?');
@@ -103,23 +104,39 @@ export default function AppShell({ children }) {
       <main className="main">
         <div className="topbar">
           <div />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <LanguageToggle />
-            <NavLink to={role === 'admin' ? '/admin/incidents' : `/${role}/notifications`} title={t('common.notifications')}>
-              <Icon name="bell" size={19} color="var(--text-secondary)" />
-            </NavLink>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <Avatar initials={initials} role={role === 'company' ? 'company' : 'student'} size={32} />
-              <div style={{ lineHeight: 1.25 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 500 }}>{profileName}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{roleLabel}</div>
-              </div>
-            </div>
-            <button className="link" onClick={() => { logout(); navigate('/'); }} title={t('common.logout')} style={{ marginLeft: 4 }}>
-              <Icon name="logout" size={18} color="var(--text-muted)" />
-            </button>
+            {guest ? (
+              <>
+                <button className="ghost" onClick={() => navigate('/login')} style={{ height: 34, padding: '0 14px' }}>{t('common.login')}</button>
+                <button className="primary-amber" onClick={() => navigate('/get-started')} style={{ height: 34, padding: '0 16px' }}>{t('guest.signUp')}</button>
+              </>
+            ) : (
+              <>
+                <NavLink to={role === 'admin' ? '/admin/incidents' : `/${role}/notifications`} title={t('common.notifications')}>
+                  <Icon name="bell" size={19} color="var(--text-secondary)" />
+                </NavLink>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                  <Avatar initials={initials} role={role === 'company' ? 'company' : 'student'} size={32} />
+                  <div style={{ lineHeight: 1.25 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 500 }}>{profileName}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{roleLabel}</div>
+                  </div>
+                </div>
+                <button className="link" onClick={() => { logout(); navigate('/'); }} title={t('common.logout')} style={{ marginLeft: 4 }}>
+                  <Icon name="logout" size={18} color="var(--text-muted)" />
+                </button>
+              </>
+            )}
           </div>
         </div>
+        {guest && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 20px', background: 'var(--amber-50)', borderBottom: '0.5px solid var(--amber)', fontSize: 12.5, color: 'var(--amber-900)' }}>
+            <Icon name="eye" size={15} color="var(--amber-700)" />
+            <span>{t('guest.banner')}</span>
+            <button className="sm primary-amber" style={{ marginLeft: 'auto' }} onClick={() => navigate('/get-started')}>{t('guest.signUp')}</button>
+          </div>
+        )}
         <div className="scroll">{children}</div>
       </main>
     </div>

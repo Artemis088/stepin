@@ -42,11 +42,15 @@ import AdminIncidents from './pages/admin/Incidents.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Agreement from './pages/Agreement.jsx';
 
-function Protected({ role, children }) {
-  const { user, loading } = useAuth();
+function Protected({ role, allowGuest, children }) {
+  const { user, loading, guest } = useAuth();
   const location = useLocation();
   if (loading) return <Spinner />;
-  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!user) {
+    // Guests may browse the read-only student pages that opt in via allowGuest.
+    if (allowGuest && guest) return <AppShell guest>{children}</AppShell>;
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
   if (role && user.role !== role) {
     const home = user.role === 'student' ? '/student/internships' : user.role === 'company' ? '/company/dashboard' : '/admin';
     return <Navigate to={home} replace />;
@@ -69,9 +73,9 @@ export default function App() {
       <Route path="/signup/company" element={<CompanySignup />} />
 
       {/* Student */}
-      <Route path="/student/internships" element={<Protected role="student"><Tasks type="internship" /></Protected>} />
-      <Route path="/student/tasks" element={<Protected role="student"><Tasks type="standalone" /></Protected>} />
-      <Route path="/student/tasks/:id" element={<Protected role="student"><TaskDetail /></Protected>} />
+      <Route path="/student/internships" element={<Protected role="student" allowGuest><Tasks type="internship" /></Protected>} />
+      <Route path="/student/tasks" element={<Protected role="student" allowGuest><Tasks type="standalone" /></Protected>} />
+      <Route path="/student/tasks/:id" element={<Protected role="student" allowGuest><TaskDetail /></Protected>} />
       <Route path="/student/screening/:taskId" element={<Protected role="student"><Screening /></Protected>} />
       <Route path="/student/applications" element={<Protected role="student"><Applications /></Protected>} />
       <Route path="/student/profile" element={<Protected role="student"><Profile /></Protected>} />

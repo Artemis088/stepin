@@ -26,6 +26,10 @@ const dict = {
     'common.passwordMin': 'At least 6 characters',
     'common.emailInvalid': 'Enter a valid email address, e.g. name@example.com',
     'common.haveAccount': 'Already have an account?',
+    'guest.signUp': 'Sign up',
+    'guest.gateTitle': 'Sign up to continue',
+    'guest.gateBody': 'Create a free account or log in to apply, start a screening, and build your verified profile.',
+    'guest.banner': "You're browsing as a guest — sign up to apply for tasks and internships.",
     'role.student': 'Student',
     'role.company': 'Company',
     'role.admin': 'Platform admin',
@@ -47,6 +51,7 @@ const dict = {
     'landing.verifiedRecord': 'Verified track record',
     'landing.returning': 'Returning user?',
     'landing.demoLogins': 'Demo logins (password',
+    'landing.browseGuest': 'Browse internships as a guest',
 
     // login
     'login.title': 'Log in',
@@ -224,6 +229,10 @@ const dict = {
     'common.passwordMin': 'მინიმუმ 6 სიმბოლო',
     'common.emailInvalid': 'შეიყვანე სწორი ელფოსტა, მაგ. name@example.com',
     'common.haveAccount': 'უკვე გაქვს ანგარიში?',
+    'guest.signUp': 'რეგისტრაცია',
+    'guest.gateTitle': 'გასაგრძელებლად დარეგისტრირდი',
+    'guest.gateBody': 'შექმენი უფასო ანგარიში ან შედი, რომ განაცხადო, დაიწყო სკრინინგი და შექმნა შენი დადასტურებული პროფილი.',
+    'guest.banner': 'ათვალიერებ როგორც სტუმარი — დარეგისტრირდი, რომ განაცხადო დავალებებსა და სტაჟირებებზე.',
     'role.student': 'სტუდენტი',
     'role.company': 'კომპანია',
     'role.admin': 'პლატფორმის ადმინი',
@@ -245,6 +254,7 @@ const dict = {
     'landing.verifiedRecord': 'დადასტურებული გამოცდილება',
     'landing.returning': 'უკვე დარეგისტრირებული ხარ?',
     'landing.demoLogins': 'დემო ანგარიშები (პაროლი',
+    'landing.browseGuest': 'დაათვალიერე როგორც სტუმარი',
 
     // login
     'login.title': 'შესვლა',
