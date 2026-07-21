@@ -18,22 +18,25 @@ export function LogoMark({ size = 32 }) {
   return <img src="/logo-icon.png" width={size} height={size} alt="StepIn" style={{ display: 'block', flexShrink: 0 }} />;
 }
 
-/* Full lockup ("Step" + door + tagline) — the brand JPG, CSS-cropped to the
-   artwork so the wide white margins are trimmed. Responsive up to `width`.
-   The image's whitespace is near-white, so place it on a near-white surface. */
-export function Lockup({ width = 460 }) {
+/* Brand lockup — the JPG, CSS-cropped to the artwork (wide white margins
+   trimmed), responsive up to `width`. tagline=false crops to the "Step + door"
+   wordmark only (no "your first step…" line). Whitespace is near-white, so
+   place it on a near-white surface. */
+export function Lockup({ width = 460, tagline = true }) {
+  const bh = tagline ? 307 : 245; // full lockup vs wordmark-only crop height
+  const posY = tagline ? '45.2%' : '41.6%';
   return (
     <div
       role="img"
-      aria-label="StepIn — your first step, your future"
+      aria-label={tagline ? 'StepIn — your first step, your future' : 'StepIn'}
       style={{
         width: '100%',
         maxWidth: width,
-        aspectRatio: '760 / 307',
+        aspectRatio: `760 / ${bh}`,
         backgroundImage: 'url(/logo-lockup.jpg)',
         backgroundRepeat: 'no-repeat',
         backgroundSize: '202% auto',
-        backgroundPosition: '50.6% 45.2%',
+        backgroundPosition: `50.6% ${posY}`,
       }}
     />
   );

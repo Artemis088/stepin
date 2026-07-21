@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Icon, Avatar, LogoMark } from './ui.jsx';
+import { Icon, Avatar, Lockup } from './ui.jsx';
 import { useAuth } from '../AuthContext.jsx';
 import { api } from '../api.js';
 import { useT, LanguageToggle } from '../i18n.jsx';
@@ -56,9 +56,10 @@ export default function AppShell({ children, guest = false }) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '6px 8px 22px' }}>
-          <LogoMark size={46} />
-          <span style={{ fontSize: 23, fontWeight: 600, letterSpacing: '-0.02em' }}>StepIn</span>
+        <div style={{ padding: '4px 4px 20px' }}>
+          <div style={{ background: '#fdfdfd', border: '0.5px solid var(--border)', borderRadius: 12, padding: '10px 14px', display: 'flex', justifyContent: 'center' }}>
+            <Lockup width={150} tagline={false} />
+          </div>
         </div>
         {items.map((it) => (
           <NavLink
