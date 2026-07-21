@@ -11,19 +11,19 @@ export default function Landing() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#fdfdfd' }}>
       <div style={{ position: 'absolute', top: 20, right: 20 }}><LanguageToggle /></div>
-      <div style={{ maxWidth: 640, width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
-        <Lockup width={380} />
-        <h1 style={{ fontSize: 34, lineHeight: 1.15, letterSpacing: '-0.02em' }}>{t('landing.tagline')}</h1>
-        <p style={{ fontSize: 16, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 520 }}>
+      <div style={{ maxWidth: 620, width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
+        <Lockup width={320} />
+        <h1 style={{ fontSize: 27, lineHeight: 1.15, letterSpacing: '-0.02em' }}>{t('landing.tagline')}</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 480 }}>
           {t('landing.subtitle')}
         </p>
 
-        <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
-          <button className="primary-amber" style={{ height: 46, padding: '0 26px', fontSize: 15 }} onClick={() => navigate('/signup/student')}>
-            <Icon name="user" size={18} /> {t('landing.imStudent')}
+        <div style={{ display: 'flex', gap: 12, marginTop: 2 }}>
+          <button className="primary-amber" style={{ height: 42, padding: '0 22px', fontSize: 14 }} onClick={() => navigate('/signup/student')}>
+            <Icon name="user" size={16} /> {t('landing.imStudent')}
           </button>
-          <button className="primary-blue" style={{ height: 46, padding: '0 26px', fontSize: 15 }} onClick={() => navigate('/signup/company')}>
-            <Icon name="building" size={18} /> {t('landing.imCompany')}
+          <button className="primary-blue" style={{ height: 42, padding: '0 22px', fontSize: 14 }} onClick={() => navigate('/signup/company')}>
+            <Icon name="building" size={16} /> {t('landing.imCompany')}
           </button>
         </div>
 
