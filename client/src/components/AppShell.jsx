@@ -56,9 +56,9 @@ export default function AppShell({ children, guest = false }) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 8px 20px' }}>
-          <LogoMark />
-          <span style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em' }}>StepIn</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '6px 8px 22px' }}>
+          <LogoMark size={46} />
+          <span style={{ fontSize: 23, fontWeight: 600, letterSpacing: '-0.02em' }}>StepIn</span>
         </div>
         {items.map((it) => (
           <NavLink
