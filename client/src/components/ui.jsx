@@ -13,10 +13,30 @@ export function Icon({ name, size = 18, color, style, className = '' }) {
 }
 
 /* Icon-only mark — the brand app-icon image (door on a light rounded tile).
-   Used in the sidebars and the login/reset headers. The full lockup image
-   lives on the landing page directly (public/logo-lockup.png). */
+   Used in the sidebars and the login/reset headers. */
 export function LogoMark({ size = 32 }) {
   return <img src="/logo-icon.png" width={size} height={size} alt="StepIn" style={{ display: 'block', flexShrink: 0 }} />;
+}
+
+/* Full lockup ("Step" + door + tagline) — the brand JPG, CSS-cropped to the
+   artwork so the wide white margins are trimmed. Responsive up to `width`.
+   The image's whitespace is near-white, so place it on a near-white surface. */
+export function Lockup({ width = 460 }) {
+  return (
+    <div
+      role="img"
+      aria-label="StepIn — your first step, your future"
+      style={{
+        width: '100%',
+        maxWidth: width,
+        aspectRatio: '760 / 307',
+        backgroundImage: 'url(/logo-lockup.jpg)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '202% auto',
+        backgroundPosition: '50.6% 45.2%',
+      }}
+    />
+  );
 }
 
 /* Password input with a show/hide (eye) toggle. Drop-in for a password <input>;
