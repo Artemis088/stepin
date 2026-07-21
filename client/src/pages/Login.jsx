@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
-import { useToast, Icon, PasswordInput, LogoMark } from '../components/ui.jsx';
+import { useToast, Icon, PasswordInput } from '../components/ui.jsx';
 import { useT, LanguageToggle } from '../i18n.jsx';
 import { roleHome } from '../roleHome.js';
 
@@ -36,10 +36,9 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#eaece7' }}>
       <div style={{ position: 'absolute', top: 20, right: 20 }}><LanguageToggle /></div>
-      <form onSubmit={submit} style={{ background: 'var(--surface-0)', border: '0.5px solid var(--border)', borderRadius: 16, padding: 30, width: '100%', maxWidth: 380 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 22 }}>
-          <LogoMark />
-          <span style={{ fontSize: 18, fontWeight: 600 }}>StepIn</span>
+      <form onSubmit={submit} style={{ background: '#f4f6f3', border: '0.5px solid var(--border)', borderRadius: 16, padding: 30, width: '100%', maxWidth: 380 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+          <img src="/logo-lockup.png" alt="StepIn — your first step, your future" style={{ width: '100%', maxWidth: 300, height: 'auto', display: 'block' }} />
         </div>
         <h1 style={{ fontSize: 20, marginBottom: 18 }}>{t('login.title')}</h1>
         <div className="field">
