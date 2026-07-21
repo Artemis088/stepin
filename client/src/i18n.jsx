@@ -42,8 +42,7 @@ const dict = {
 
     // landing
     'landing.tagline': 'Get your first step in.',
-    'landing.subtitle':
-      "Companies post small, real, sample-data tasks. Students do them to earn a verified track record and a foot in the door. It's an exchange — real work for real experience, fair and safe for both sides.",
+    'landing.subtitle': 'Real tasks from companies. Complete them and earn your first experience.',
     'landing.imStudent': "I'm a student",
     'landing.imCompany': "I'm a company",
     'landing.realTasks': 'Real tasks',
@@ -294,8 +293,7 @@ const dict = {
 
     // landing
     'landing.tagline': 'გადადგი შენი პირველი ნაბიჯი.',
-    'landing.subtitle':
-      'კომპანიები აქვეყნებენ მცირე, რეალურ დავალებებს სანიმუშო მონაცემებით. სტუდენტები ასრულებენ მათ, რათა მოიპოვონ დადასტურებული გამოცდილება და პირველი შესაძლებლობა. ეს არის გაცვლა — რეალური სამუშაო რეალური გამოცდილების სანაცვლოდ, სამართლიანი და უსაფრთხო ორივე მხარისთვის.',
+    'landing.subtitle': 'რეალური დავალებები კომპანიებისგან. დაასრულე და მოიპოვე პირველი გამოცდილება.',
     'landing.imStudent': 'მე სტუდენტი ვარ',
     'landing.imCompany': 'ჩვენ კომპანია ვართ',
     'landing.realTasks': 'რეალური დავალებები',
