@@ -152,7 +152,7 @@ export default function TaskDetail() {
           </div>
           {applied ? (
             <div>
-              <button className="primary-teal" style={{ width: '100%', height: 44 }} onClick={() => navigate(task.myStage === 'interested' ? `/student/screening/${id}` : '/student/applications')}>
+              <button className="primary-teal" style={{ width: '100%', minHeight: 44, padding: '8px 12px', fontSize: 13.5, lineHeight: 1.25, whiteSpace: 'normal' }} onClick={() => navigate(task.myStage === 'interested' ? `/student/screening/${id}` : '/student/applications')}>
                 {task.myStage === 'interested' ? t('td.continueScreening') : t('td.viewApplication')}
               </button>
               <div className="muted" style={{ fontSize: 11, marginTop: 8, textAlign: 'center' }}>{t('td.youreIn')} {t(`stage.${task.myStage}`)}</div>
@@ -161,7 +161,7 @@ export default function TaskDetail() {
             <div>
               <button
                 className="primary-amber"
-                style={{ width: '100%', height: 44 }}
+                style={{ width: '100%', minHeight: 44, padding: '8px 12px', fontSize: 13.5, lineHeight: 1.25, whiteSpace: 'normal' }}
                 onClick={guest ? () => gate() : apply}
                 disabled={guest ? false : busy || task.countdowns.apply?.overdue}
               >
