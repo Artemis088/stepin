@@ -57,7 +57,7 @@ export default function AppShell({ children, guest = false }) {
     <div className="shell">
       <aside className="sidebar">
         <div style={{ padding: '4px 4px 20px' }}>
-          <div style={{ background: '#fdfdfd', border: '0.5px solid var(--border)', borderRadius: 12, padding: '10px 14px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ background: '#fdfdfd', border: '0.5px solid var(--border)', borderRadius: 18, padding: '10px 14px', display: 'flex', justifyContent: 'center' }}>
             <Lockup width={150} tagline={false} />
           </div>
         </div>
